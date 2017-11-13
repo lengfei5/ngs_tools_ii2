@@ -12,13 +12,15 @@ nb_cores=2
 cwd=`pwd`
 DIR_BAMs=$PWD/ngs_raw/BAMs
 DIR_FASTQs=$PWD/ngs_raw/FASTQs
+DIR_QC=$PWD/ngs/FASTQC
 mkdir -p $DIR_BAMs;
 mkdir -p $DIR_FASTQs;
+mkdir -p $DIR_QC;
 mkdir -p $cwd/logs;
 
 # download bam files from links
-while IF=$'\t' read -r line; do
-    echo $line;
+while read -r line; do
+    #echo $line;
     IFS=$'\t' read -r "id" "type" "flowcell" "lane" "result" "countsQ30" "distinct" "preparation" "own_risk" "url" "md5" "comment" <<<  "$line"
     #echo $line{@}
     #url=`echo $line |tr`
@@ -27,16 +29,15 @@ while IF=$'\t' read -r line; do
     #echo $own_risk
     #echo $md5
     #exit;
-    ff=`basename $url`
+    #ff=`basename $url`
     ff=${url##*/}
-    echo $ff;
+    #echo $ff;
     
-    if [ ! -e "${DIR_BAMs}/$ff" ] && [ $url=="http:*" ]; then
-	#echo $url
+    if [ ! -e "${DIR_BAMs}/$ff" ] && [ `echo "$url" |grep "http"`]; then
+	echo $url
 	#echo $url2
 	# download
 	wget -c --no-check-certificate --auth-no-challenge $url -P $DIR_BAMs
-			
     else
 	echo "$ff already downloaded ! "
     fi
