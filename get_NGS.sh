@@ -22,8 +22,6 @@ mkdir -p $cwd/logs;
 while read -r line; do
     #echo $line;
     IFS=$'\t' read -r "id" "type" "flowcell" "lane" "result" "countsQ30" "distinct" "preparation" "own_risk" "url" "md5" "comment" <<<  "$line"
-    #echo $line{@}
-    #url=`echo $line |tr`
     #echo $line;
     echo $url
     #echo $own_risk
@@ -32,7 +30,6 @@ while read -r line; do
     #ff=`basename $url`
     ff=${url##*/}
     #echo $ff;
-    
     if [ ! -e "${DIR_BAMs}/$ff" ] && [ `echo "$url" |grep "http"`]; then
 	echo $url
 	#echo $url2
