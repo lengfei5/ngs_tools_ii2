@@ -31,7 +31,7 @@ DIR_FC=$PWD/ngs_raw/RAWs #folder for unsplitted bam
 DIR_SRA=$PWD/ngs_raw/SRAs #folder for SRA files
 DIR_BAMs=$PWD/ngs_raw/BAMs #folder for splitted bam 
 DIR_FASTQs=$PWD/ngs_raw/FASTQs #folder for fastq 
-DIR_QC=$PWD/ngs/FASTQC # folder for fast qc
+DIR_QC=$PWD/ngs_raw/FASTQC # folder for fast qc
 mkdir -p $cwd/logs; # folder for logs 
 
 ## demultiplex raw bam files                                                                                                                            
@@ -93,7 +93,7 @@ if [ `ls -l $DIR_BAMs/*.bam 2>/dev/null|wc -l` -gt 0 ]; then
         out=${ff%.bam};
 	echo $out
 	if [ "${DIR_FASTQs}/${out}.fastq" -ot "$file" ]; then
-	    qsub -q public.q -o ${cwd}/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N star_mapping "module load bedtools; bamToFastq -i ${DIR_BAMs}/$ff -fq ${DIR_FASTQs}/${out}.fastq; module load fastqc; fastqc ${DIR_FASTQs}/${out}.fastq -o ${DIR_QC};"
+	    qsub -q public.q -o ${cwd}/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N bam2fastqc "module load bedtools; bamToFastq -i ${DIR_BAMs}/$ff -fq ${DIR_FASTQs}/${out}.fastq; module load fastqc; fastqc ${DIR_FASTQs}/${out}.fastq -o ${DIR_QC};"
 	fi
     done
 else
