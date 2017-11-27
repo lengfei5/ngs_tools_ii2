@@ -70,10 +70,10 @@ if [ -z $Demultiplex ] && [ -z $SRA ]; then
     
 	ff=${url##*/}
         #echo $ff;
-	if [ ! -e "${DIR_BAMs}/$ff" ] && [ `echo "$url" |grep "http"`]; then
+	if [ ! -e "${DIR_BAMs}/$ff" ] && [ `echo "$url" |grep "http"` ]; then
 	    echo $url
 	    #echo $url2
-	    wget -c --no-check-certificate --auth-no-challenge $url -P $DIR_BAMs
+	    wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url -P $DIR_BAMs
 	else
 	    echo "$ff already downloaded ! "
 	fi
