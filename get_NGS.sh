@@ -1,17 +1,34 @@
 #######
-# this script is to down unaligned bam files using links sent from vbcf
-# convert bam to fastq
+## this script is to convert raw data (undemultiplexed, sra and demultiplexed bam files) to fastq files
+## Input: text file "URLs_download.txt", or sra files in ngs_raw/SRAs/ or bam files in ngs_raw/BAMs/
+## convert bam to fastq
 ######
 # print host name and date
 hostname
 date
 
-while getopts ":ds" opts; do
-    case "$opts" in 
+while getopts ":huds" opts; do
+    case "$opts" in
+	"h")
+	    echo "script to dowload demultipled bams from vbcf url, convert bam files, sra files and demultiplex bams "
+            echo "Usage: dowload bams from url links and convert them to fastq" 
+	    echo "$0 -u URL_dowload.txt "
+	    echo "convert sra (in the folder of ngs_raw/SRAs) to fastq files "
+	    echo "$0 -d "
+	    echo "demultiplex bam files (in the folder of ngs_raw/RAWs) and convert them to fastq"
+	    echo "$0 -s "
+	    echo "convert bam files (in the folder of ngs_raw/BAMs) to fastq"
+	    echo "$0 "
+            exit 0
+            ;;
+
+	"u")
+	    URL="TRUE"
+	    ;;
 	"d")
 	    Demultiplex="TRUE"
 	    ;;
-	"s")
+ 	"s")
 	    SRA="TRUE"
 	    ;;
 	"?")
@@ -34,11 +51,17 @@ DIR_FASTQs=$PWD/ngs_raw/FASTQs #folder for fastq
 DIR_QC=$PWD/ngs_raw/FASTQC # folder for fast qc
 mkdir -p $cwd/logs; # folder for logs 
 
+ 
+mkdir -p $DIR_BAMs;
+mkdir -p $DIR_FASTQs;
+mkdir -p $DIR_QC;
+  
 ## demultiplex raw bam files                                                                                                                            
 if [ -n "$Demultiplex" ]; then
     echo "start to demultiplex the bam file"
     mkdir -p $DIR_BAMs;
     cd $DIR_FC;
+    
     for RAW in ${DIR_FC}/*.bam; do
 	echo $RAW
 	FC=`echo $RAW | cut -d"_" -f1`;
@@ -46,21 +69,18 @@ if [ -n "$Demultiplex" ]; then
 	echo $FC $lane;
 	qsub -q public.q -o ${cwd}/logs -j yes -pe smp 8 -cwd -b y -shell y -N demultiplex  "/groups/vbcf-ngs/bin/funcGen/jnomicss.sh illumina2BamSplit --inputFile $RAW; mv ${FC}_demux_${lane}/*#[^0]*.bam $DIR_BAMs;"
     done
+
     cd $cwd;
 fi
 
 if [ -n "$SRA" ]; then
     echo "dealing with SRA files"
- 
+    echo "to complete !!!"
 fi
 
-if [ -z $Demultiplex ] && [ -z $SRA ]; then
+if [ -n "$URL" ]; then
     file_urls="URLs_download.txt"
-    
-    mkdir -p $DIR_BAMs;
-    mkdir -p $DIR_FASTQs;
-    mkdir -p $DIR_QC;
-    
+     
     # download bam files from links
     while read -r line; do
         #echo $line;
