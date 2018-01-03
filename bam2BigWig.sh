@@ -2,7 +2,6 @@
 nb_cores=2
 bams="${PWD}/alignments/BAMs_All"
 OUT="${PWD}/bigWigs"
-#DIR_rmdup="${PWD}/alignment/BAMs_All"
 
 mkdir -p $OUT
 mkdir -p ${PWD}/logs

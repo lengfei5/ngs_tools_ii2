@@ -7,7 +7,7 @@
 hostname
 date
 
-while getopts ":huds" opts; do
+while getopts ":hudsp" opts; do
     case "$opts" in
 	"h")
 	    echo "script to dowload demultipled bams from vbcf url, convert bam files, sra files and demultiplex bams "
@@ -19,9 +19,10 @@ while getopts ":huds" opts; do
 	    echo "$0 -s "
 	    echo "convert bam files (in the folder of ngs_raw/BAMs) to fastq"
 	    echo "$0 "
+	    echo "convert paired-end bam files (in the folder of ngs_raw/BAMs) to fastq"
+	    echo "$0 -p "
             exit 0
             ;;
-
 	"u")
 	    URL="TRUE"
 	    ;;
@@ -30,6 +31,9 @@ while getopts ":huds" opts; do
 	    ;;
  	"s")
 	    SRA="TRUE"
+	    ;;
+	"p")
+	    PAIRED="TRUE"
 	    ;;
 	"?")
 	    echo "Unknown option $opts"
@@ -43,15 +47,15 @@ done
 
 nb_cores=2
 cwd=`pwd`
+file_urls="URLs_download.txt" # download url file
 
 DIR_FC=$PWD/ngs_raw/RAWs #folder for unsplitted bam 
 DIR_SRA=$PWD/ngs_raw/SRAs #folder for SRA files
 DIR_BAMs=$PWD/ngs_raw/BAMs #folder for splitted bam 
 DIR_FASTQs=$PWD/ngs_raw/FASTQs #folder for fastq 
 DIR_QC=$PWD/ngs_raw/FASTQC # folder for fast qc
-mkdir -p $cwd/logs; # folder for logs 
 
- 
+mkdir -p $cwd/logs; # folder for logs 
 mkdir -p $DIR_BAMs;
 mkdir -p $DIR_FASTQs;
 mkdir -p $DIR_QC;
@@ -73,15 +77,14 @@ if [ -n "$Demultiplex" ]; then
     cd $cwd;
 fi
 
+## convert sra files to fastq or bam files
 if [ -n "$SRA" ]; then
     echo "dealing with SRA files"
     echo "to complete !!!"
 fi
 
+## download bams files using a files containing url links from vbcf
 if [ -n "$URL" ]; then
-    file_urls="URLs_download.txt"
-     
-    # download bam files from links
     while read -r line; do
         #echo $line;
 	IFS=$'\t' read -r "id" "type" "flowcell" "lane" "result" "countsQ30" "distinct" "preparation" "own_risk" "url" "md5" "comment" <<<  "$line"
@@ -97,7 +100,6 @@ if [ -n "$URL" ]; then
 	else
 	    echo "$ff already downloaded ! "
 	fi
-    
     done < "$file_urls"
 fi
 
@@ -112,8 +114,17 @@ if [ `ls -l $DIR_BAMs/*.bam 2>/dev/null|wc -l` -gt 0 ]; then
 	ff=`basename $file`
         out=${ff%.bam};
 	echo $out
-	if [ "${DIR_FASTQs}/${out}.fastq" -ot "$file" ]; then
-	    qsub -q public.q -o ${cwd}/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N bam2fastqc "module load bedtools; bamToFastq -i ${DIR_BAMs}/$ff -fq ${DIR_FASTQs}/${out}.fastq; module load fastqc; fastqc ${DIR_FASTQs}/${out}.fastq -o ${DIR_QC};"
+	
+	if [ "$PAIRED" != "TRUE" ]; then
+	    echo "single-end bam "
+	    if [ "${DIR_FASTQs}/${out}.fastq" -ot "$file" ]; then
+		qsub -q public.q -o ${cwd}/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N bam2fastqc "module load bedtools; bamToFastq -i ${DIR_BAMs}/$ff -fq ${DIR_FASTQs}/${out}.fastq; module load fastqc; fastqc ${DIR_FASTQs}/${out}.fastq -o ${DIR_QC};"
+	    fi
+	else 
+	    echo "paired-end bam"
+	    if [ "${DIR_FASTQs}/${out}_R1.fastq" -ot "$file" ]; then
+	        qsub -q public.q -o ${cwd}/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N bam2fastqc "module load bedtools; bamToFastq -i ${DIR_BAMs}/$ff -fq ${DIR_FASTQs}/${out}_R1.fastq  -fq2 ${DIR_FASTQs}/${out}_R2.fastq; module load fastqc; fastqc ${DIR_FASTQs}/${out}_R1.fastq ${DIR_FASTQs}/${out}_R2.fastq -o ${DIR_QC};"
+	    fi
 	fi
     done
 else
