@@ -1,5 +1,5 @@
 ############
-## this script is to run fastqc for the ngs data 
+# this script is to run fastqc for the ngs data 
 ############
 nb_cores=2
 cwd=$PWD
