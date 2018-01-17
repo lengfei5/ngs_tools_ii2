@@ -6,7 +6,7 @@ cwd=$PWD
 
 DIR_fastq="${PWD}/ngs_raw/FASTQs"
 #echo $DIR_fastq
-DIR_FastQCs=$PWD/ngs_raw/FastQCs;
+DIR_FastQCs=$PWD/ngs_raw/FASTQC;
 
 mkdir -p $PWD/logs
 mkdir -p ${DIR_FastQCs} 

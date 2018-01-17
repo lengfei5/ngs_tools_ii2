@@ -1,5 +1,6 @@
+#########################
 ## two arguments required: genome sequenced to be indexed (e.g. mm9.fa) and the directory for the index
-
+########################
 nb_cores=10;
 cwd=`pwd`
 
