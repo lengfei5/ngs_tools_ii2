@@ -1,15 +1,53 @@
 #############
-## This script is to merge bam files
-## passing arguments requires input (directory or bams files), output directory,
-## and a text file to specify according what to merge (same sample ID or replicates, i.e., same condition) and file names after merging. 
+# This script is to merge bam files
+# requiring arguments:
+# input (directory for bams files),
+# output directory (optional if different from the directory of initial bams),
+# a text file that specifies according what to merge 
+# (same sample ID or replicates, i.e., same condition) and file names after merging. 
 ############
-bams="$1";
-DIR_OUT="$2"
-params="$3"
+while getopts ":hD:O:f:" opts; do
+    case "$opts" in
+        "h")
+            echo "This script is to merge bam files requiring arguments: "
+	    echo "input (directory for bams files) "
+            echo "output directory (optional if different from the directory of initial bams) "
+            echo "a text file that specifies according what to merge "
+            echo "(same sample ID or replicates, i.e., same condition) and file names after merging." 
+	    echo "....................";
+            echo "Usage:"
+            echo "$0 -D alignments/BAMs_All -O BAMs_merged -f file4merged.txt"
+            exit 0
+            ;;
+        "D")
+            DIR_Bams="$OPTARG"
+            ;;
+	"O")
+	    DIR_OUT="$OPTARG";
+	    ;;
+	"f")
+	    params="$OPTARG";
+	    ;;
+        "?")
+            echo "Unknown option $opts"
+            ;;
+        ":")
+            echo "No argument value for option -DOf "
+	    exit 1;
+            ;;
+    esac
+done
+
+if [ -z "$DIR_OUT" ]; then 
+    DIR_OUT=$DIR_Bams;
+fi
 
 cwd=$PWD;
 nb_cores=4;
 
+#bams="$1";
+#DIR_OUT="$2"
+#params="$3"
 #conditions="AN312_ 515D10_  515D10H3_ D10A8_ D10D8_ 924E12_ E12F01_"
 #factors="tbx H3K4me1 H3K4me2 H3K4me3 H3K9me3 H3K27me3 H3K27ac"
 
@@ -26,8 +64,8 @@ while read -r line; do
     if [ "$id" != "sampleID" ]; then
 	echo $id #$cond
 	echo $cond
-	echo $bams
-	old=($(echo "$bams" | grep "$id"));
+	#echo $bams
+	old=($(ls ${DIR_Bams}/*.bam | grep "$id"));
 	
 	echo ${#old[@]}
 	#echo ${old[@]};
