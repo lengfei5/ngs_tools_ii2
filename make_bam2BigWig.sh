@@ -30,7 +30,7 @@ while getopts ":hD:s" opts; do
     esac
 done
 
-nb_cores=2
+nb_cores=4
 if [ -z "$DIR_bams" ]; then
     DIR_bams="${PWD}/alignments/BAMs_All"
     echo "bam directory is $DIR_bams"

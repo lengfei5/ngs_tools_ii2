@@ -1,9 +1,9 @@
 #####
 ## this script is to demultiplex the bam files from vbcf
 ####
-INDEXREAD="TRUE"
 
-nb_cores=10
+INDEXREAD="FALSE"
+nb_cores=8
 DIR_cwd=`pwd`
 DIR_FC=$PWD/ngs_raw/RAWs
 DIR_OUT=$PWD/ngs_raw/BAMs
@@ -25,7 +25,7 @@ for RAW in ${DIR_FC}/*.bam; do
     else
 	qsub -q public.q -o $DIR_cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N demultiplex \
 	    "/groups/vbcf-ngs/bin/funcGen/jnomicss.sh illumina2BamSplit --inputFile $RAW \
-            --indexRead dual2 --correctdual standard --dualBClength1 6 --dualBClength2 8"            
+            --indexRead dual2 --correctdual none --dualBClength1 8 --dualBClength2 8"            
             #--indexRead dual2 --dualBClength1 6 --correctdual standard"
     fi;
     
