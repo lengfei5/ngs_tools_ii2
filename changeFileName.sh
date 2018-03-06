@@ -1,7 +1,8 @@
-#######
-## This script is to copy file and change file's name
-## this should be done before mapping to the genome
-#######
+############################
+# This script is to copy file and change file's name
+# this should be done before mapping to the genome
+#
+##########################
 set -u;
 
 DIR="$1";

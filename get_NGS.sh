@@ -60,8 +60,7 @@ mkdir -p $DIR_BAMs;
 mkdir -p $DIR_FASTQs;
 mkdir -p $DIR_QC;
   
-## demultiplex raw bam files                                                                                                                            
-if [ -n "$Demultiplex" ]; then
+## demultiplex raw bam files                                                                                  if [ -n "$Demultiplex" ]; then
     echo "start to demultiplex the bam file"
     mkdir -p $DIR_BAMs;
     cd $DIR_FC;
