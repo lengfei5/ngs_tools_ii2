@@ -43,13 +43,7 @@ if [ -z "$DIR_OUT" ]; then
 fi
 
 cwd=$PWD;
-nb_cores=4;
-
-#bams="$1";
-#DIR_OUT="$2"
-#params="$3"
-#conditions="AN312_ 515D10_  515D10H3_ D10A8_ D10D8_ 924E12_ E12F01_"
-#factors="tbx H3K4me1 H3K4me2 H3K4me3 H3K9me3 H3K27me3 H3K27ac"
+nb_cores=2;
 
 mkdir -p $DIR_OUT
 mkdir -p $cwd/logs
@@ -84,6 +78,7 @@ while read -r line; do
 	
 	elif [[ ${#old[@]} -eq 1 ]]; then
 	    #echo ${#old[@]};
+	    echo "WARNING: only one file found "
 	    echo "why is here"
 	    #out=${}_merged
 	    #ids=`echo "$old" | cut -d'_' -f3`

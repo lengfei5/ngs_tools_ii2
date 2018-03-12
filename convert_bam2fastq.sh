@@ -1,7 +1,6 @@
 ###################
 ## bam2fastq script
 ###################
-
 nb_cpus=1
 DIR_INPUT="${PWD}/ngs_raw/BAMs"
 DIR_OUT="${PWD}/ngs_raw/FASTQs"
