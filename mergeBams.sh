@@ -43,7 +43,7 @@ if [ -z "$DIR_OUT" ]; then
 fi
 
 cwd=$PWD;
-nb_cores=2;
+nb_cores=6;
 
 mkdir -p $DIR_OUT
 mkdir -p $cwd/logs
@@ -51,17 +51,18 @@ mkdir -p $cwd/logs
 #i=1;
 #cd $DIR_Bams;
 #for ss in $factors; 
+#red=`tput setaf 1`
 while read -r line; do   
     #echo $line;
     IFS=$'\t' read -r "id" "cond" <<< "$line"
     
     if [ "$id" != "sampleID" ]; then
-	echo $id #$cond
-	echo $cond
-	#echo $bams
 	old=($(ls ${DIR_Bams}/*.bam | grep "$id"));
 	
-	echo ${#old[@]}
+	echo ${#old[@]} "Files :  " $id "--" $cond
+	#echo $cond
+	#echo $bams
+	#echo $old;
 	#echo ${old[@]};
 	
 	out=${cond}_${id}_merged
@@ -69,7 +70,7 @@ while read -r line; do
 	if [[ ${#old[@]} -gt 1 ]]; then
 	    	    
 	    #out=${out}_merged;
-	    echo $out;
+	    #echo $out;
 	    #echo here
 	    if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
 		#echo "here"
@@ -78,21 +79,21 @@ while read -r line; do
 	
 	elif [[ ${#old[@]} -eq 1 ]]; then
 	    #echo ${#old[@]};
-	    echo "WARNING: only one file found "
-	    echo "why is here"
+	    echo "---------------WARNING: ONLY ONE file found--------- "
+	    #echo "why is here"
 	    #out=${}_merged
 	    #ids=`echo "$old" | cut -d'_' -f3`
 	    #out=${cond}${ss}_${ids}_merged
 	    #echo ${old[@]};
 	    #echo $ids
-	    echo $out;
+	    #echo $out;
 	    if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
 		qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N mergeBam "cp ${old[@]} ${DIR_OUT}/${out}.bam; module load samtools/1.3.1; samtools index ${DIR_OUT}/${out}.bam; "
 	    fi;
 	else
 	    echo "NOT FOUND Bam files for $ss and $cond "
 	fi
-	echo ">>>>>"
+	#echo ">>>>>"
 	#break;
     fi
 done < "$params" 
