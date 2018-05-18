@@ -1,22 +1,54 @@
 ############################
 # This script is to copy file and change file's name
 # this should be done before mapping to the genome
-#
+# # there are bugs in this code, further check required
 ##########################
-set -u;
+#set -u;
+while getopts ":hD:f:" opts; do
+    case "$opts" in
+        "h")
+            echo "script to change file names with two arguments required"
+	    echo "-D the directory of files "
+	    echo "-f the file for the processed design matrix for the sample information"
+            echo "Usage: "
+            echo "$0 -D alignments/BAMs_All -f Design_matrix_manual_R6118_parsed.txt"
+            exit 0
+            ;;
+        "D")
+            DIR="$OPTARG";
+            ;;
+        "f")
+            PARAM="$OPTARG";
+            ;;
+        "?")
+            echo "Unknown option $opts"
+            ;;
+        ":")
+            echo "No argument value for option $opts"
+	    ;;
+        esac
+done
 
-DIR="$1";
+#DIR="$1";
 #DIR="$PWD/ngs_raw/FASTQs"
 #DIR_OUT="$PWD/ngs_raw/FASTQs"
 
 if [ ! -d "$DIR" ]; then
+    echo "Directory missing..."
     exit 1;
 fi
 
-cwd=$PWD;
-PARAM="${PWD}/sampleInformation.txt"
+if [ ! -e "$PARAM" ]; then
+    echo "design matrix file missing..."
+else
+    PARAM=${PWD}/${PARAM}
+fi
 
+cwd=$PWD;
+#PARAM="${PWD}/sampleInformation.txt"
 #mkdir -p $DIR_OUT
+
+echo $DIR, $PARAM;
 cd $DIR
 
 i=1;
