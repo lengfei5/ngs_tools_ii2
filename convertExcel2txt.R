@@ -7,10 +7,25 @@
 ##################################################
 args = commandArgs(trailingOnly=TRUE)
 
+# args = "R5750_Sample_IDs.xlsx"
 # test if there is at least one argument: if not, return an error
 if (length(args)==0){
   stop("At least one argument must be supplied (input_file).xlsx", call.=FALSE)
 }else{
+  strparsing = function(x)
+  {
+    #x = sheet[2, 2]
+    y = as.character(x);
+    patterns = c("-",  "/", " ","+", "//")
+    strs = unlist(strsplit(y, ""))
+    mm = match(strs, patterns)
+    strs[which(!is.na(mm)==TRUE)] = "."
+    strs = paste0(strs, collapse = "")
+    #strs = gsub("....", ".", strs);
+    #strs = gsub("...", ".", strs);
+    #strs = gsub("..", ".", strs);
+    return(strs)
+  }
   library(openxlsx)
   library(tools)
   for(n in 1:length(args))
@@ -27,7 +42,17 @@ if (length(args)==0){
       }
     }
     
-    newff = data.frame(sheet[ ,1], apply(sheet[, -1], 1, function(x) paste0(as.character(x), collapse = "_")))
+    if(ncol(sheet)>2){
+      newff = data.frame(sheet[ ,1], apply(sheet[, -1], 1, function(x) paste0(strparsing(x), collapse = "_")))
+    }else{
+      if(ncol(sheet)==2){
+        newff = data.frame(sheet[, 1], sapply(sheet[, -1], strparsing))
+      }else{
+        cat("ERROR: there is ONLY one column....")
+      }
+      
+    }
+    
     colnames(newff) = c("sampleID", "fileName")
     write.table(newff, file=paste0(filename, ".txt"), sep = "\t", quote = FALSE, col.names = TRUE, row.names = FALSE)
     #print(sheet[1,])
