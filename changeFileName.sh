@@ -7,10 +7,12 @@
 while getopts ":hD:f:" opts; do
     case "$opts" in
         "h")
-            echo "script to change file names with two arguments required"
-	    echo "-D the directory of files "
+            echo "script to change file names (usually fastq or bam)"  
+	    echo "the file names would be done for bam (before or after alignment, or fastq)"
+	    echo "Two arguments required"
+	    echo "-D the directory of files (the folder for fastq or bam) "
 	    echo "-f the file for the processed design matrix for the sample information"
-            echo "Usage: "
+            echo "Usage:"
             echo "$0 -D alignments/BAMs_All -f Design_matrix_manual_R6118_parsed.txt"
             exit 0
             ;;
@@ -29,10 +31,6 @@ while getopts ":hD:f:" opts; do
         esac
 done
 
-#DIR="$1";
-#DIR="$PWD/ngs_raw/FASTQs"
-#DIR_OUT="$PWD/ngs_raw/FASTQs"
-
 if [ ! -d "$DIR" ]; then
     echo "Directory missing..."
     exit 1;
@@ -40,48 +38,46 @@ fi
 
 if [ ! -e "$PARAM" ]; then
     echo "design matrix file missing..."
+    exit 1;
 else
     PARAM=${PWD}/${PARAM}
 fi
 
 cwd=$PWD;
-#PARAM="${PWD}/sampleInformation.txt"
 #mkdir -p $DIR_OUT
 
-echo $DIR, $PARAM;
+echo "Changing file names for folder --" $DIR "-- using ", $PARAM;
 cd $DIR
 
 i=1;
-while read -r line;
-do 
+while read -r line; do 
     read -r "ID" "condition"  <<< "$line"
     if [[ $i -gt 1 ]]; then
-	echo $ID;
-	files=( $(ls -l | grep $ID | awk '{print $9}') )
-	#echo ${files[@]};
-	#echo ${#old[@]};
-	if [ ${#files[@]} -ge 1 ]; then
-	    for old in "${files[@]}"
-	    do 
-		#extension=`echo "$old" | cut -d'.' -f2`
-		extension=${old#*.}
-		#echo $extension;
-		#extension="bam.bai"
-		new=${condition}_${ID}.${extension};
-		echo $old;
-		echo $new
-	        #cp "$old" $DIR_OUT
-	        mv "$old" "$new"
-	        #mv "$new" $DIR_OUT
-	    done
-	else
-	    echo "NO FILES found"
-	fi
+	#echo $ID;
+	files=( $(ls | grep $ID) )
 	
+	if [ ${#files[@]} -ge 1 ]; then ## one for .bam and the other for .bam.bai
+	    if [ ${#files[@]} -gt 2 ]; then
+		echo "More than 2 FILES found for " $ID "--" "${files[@]}";
+	    else
+		for old in "${files[@]}"; do 
+		    extension=${old#*.}
+		    new=${condition}_${ID}.${extension};
+		    if [ ! -e "$new" ]; then
+			#echo $old "--" $new
+			echo "--"
+			mv "$old" "$new"
+		    else
+			echo "file existed already --", $new 
+		    fi
+	        done
+	    fi
+	else
+	    echo "NO FILES found -- " $ID;
+	fi
     fi
-    
     i=$((i + 1));
-    #IFS=$','
+    
 done < "$PARAM"
 
 cd $cwd;
