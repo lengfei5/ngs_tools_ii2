@@ -10,7 +10,7 @@ while getopts ":hD:se:" opts; do
             echo "current version is using deeptools v2.2.3 and python 2.7.3"
             echo "Usage:"
 	    echo " -h  (help)"
-	    echo " -D XXX (directory for bam input, defaut is alignments/BAMs_All)"
+	    echo " -D (ABSOLUTE directory for bam input or by defaut alignments/BAMs_All)"
 	    echo " -s (strand-specific, defaut is no)"
 	    echo " -e INT extend read length ,default is 0 bp "
 	    echo "..... "
