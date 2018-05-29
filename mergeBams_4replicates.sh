@@ -87,7 +87,6 @@ else
 fi
 #echo $tomerge;
 
-#exit;
 for selection in "${tomerge[@]}"; do
     #echo $selection
     #exit
@@ -107,17 +106,18 @@ for selection in "${tomerge[@]}"; do
 	out=${selection}_${id}merged
     fi
     
+    ## if >= 2 bams found
     if [[ ${#old[@]} -gt 1 ]]; then
 	if [ ! -e "${DIR_OUT}/${out}.bam" ] ; then
-	    echo ${#old[@]} "Files for --" $selection  "-- with file name --" $out
+	    echo ${#old[@]} "files found --" $selection  "-- merged file name:" $out
 	    qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N mergeBam "module load samtools/1.3.1; samtools merge ${DIR_OUT}/${out}_unsorted.bam ${old[@]}; samtools sort -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam; samtools index ${DIR_OUT}/${out}.bam; rm $DIR_OUT/${out}_unsorted.bam; mv ${old[@]} $DIR_backup;"
 	fi;
     fi
-    
+    ## only 1 bam found
     if [[ ${#old[@]} -eq 1 ]] && [ "$merge_bioRep" == "TRUE" ]; then
-	echo ${#old[@]} "Files for --" $selection  "-- with file name --" $out
+	echo ${#old[@]} "file found --" $selection  "-- merged file name:" $out
    	if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
-	    echo qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N mergeBam "cp ${old[@]} ${DIR_OUT}/${out}.bam; module load samtools/1.3.1; samtools index ${DIR_OUT}/${out}.bam; mv ${old[@]} $DIR_backup;"
+	    qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N mergeBam "cp ${old[@]} ${DIR_OUT}/${out}.bam; module load samtools/1.3.1; samtools index ${DIR_OUT}/${out}.bam; mv ${old[@]} $DIR_backup;"
 	fi;
     fi
     
