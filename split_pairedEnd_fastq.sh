@@ -2,7 +2,7 @@
 ## this script is to split paired_end fastq file into forward and reverse fastq files
 ## by involking another function deinterleave_fastq.sh
 ###############
-nb_cores=2
+nb_cores=6
 cwd=`pwd`
 deinterleaver="/home/imp/jingkui.wang/scripts/ngs_tools/deinterleave_fastq.sh"
 
