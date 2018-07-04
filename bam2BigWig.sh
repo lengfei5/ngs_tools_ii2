@@ -12,7 +12,7 @@ while getopts ":hD:se:" opts; do
 	    echo " -h  (help)"
 	    echo " -D (ABSOLUTE directory for bam input or by defaut alignments/BAMs_All)"
 	    echo " -s (strand-specific, defaut is no)"
-	    echo " -e INT extend read length ,default is 0 bp "
+	    echo " -e INT extend read length, the default is 0 bp "
 	    echo "..... "
 	    echo "Example:"
             echo "$0 (if bam files in alignments/BAMs_All for chipseq) "
