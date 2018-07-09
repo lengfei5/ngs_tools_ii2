@@ -3,12 +3,10 @@
 #
 #########################################
 file_urls="$1";
-#file_urls="URLs_modEncode_histone_marks.txt"
-#$OUT="$PWD/DATA/"
 
 while read -r line; do
     #echo $line;
-    url=`echo "$line" | tr '\t' '\n'|grep "http"`
+    url=`echo "$line" | tr '\t' '\n'|grep "http\|ftp"`
     if [ -n "$url" ]; then
 	file=`basename $url`
 		
