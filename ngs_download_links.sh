@@ -15,6 +15,8 @@ while read -r line; do
 	    echo $url
 	    echo $file
 	    wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url;
+	    touch $file;
+
 	else
 	    echo "$file -- downloaded !!!"
 	fi
