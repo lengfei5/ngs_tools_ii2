@@ -1,7 +1,7 @@
 #####
 ## this script is to demultiplex the bam files from vbcf
 ####
-nb_cores=8
+nb_cores=6
 
 INDEXREAD="FALSE"
 FourC="FALSE"

@@ -3,6 +3,9 @@
 #
 #########################################
 file_urls="$1";
+nb_cores=1;
+DIR_cwd=`pwd`;
+mkdir -p $PWD/logs
 
 while read -r line; do
     #echo $line;
@@ -14,8 +17,7 @@ while read -r line; do
 	    #echo "here"
 	    echo $url
 	    echo $file
-	    wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url;
-	    touch $file;
+	    qsub -q public.q -o $DIR_cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N download "wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; touch $file;"
 
 	else
 	    echo "$file -- downloaded !!!"
