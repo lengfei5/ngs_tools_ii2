@@ -83,7 +83,9 @@ if [ "$merge_techRep" == "TRUE" ]; then
     #echo $tomerge
 else
     echo "-- Merge Biological Replicates --"
+    echo "files to be merged "
     tomerge=(`cat $params | cut -f2 | sort -u |grep -v fileName|grep -v condition`)
+    echo $tomerge
 fi
 #echo $tomerge;
 
