@@ -46,7 +46,9 @@ fi
 cwd=$PWD;
 #mkdir -p $DIR_OUT
 
-echo "Changing file names for folder --" $DIR "-- using ", $PARAM;
+echo "Changing file names:"
+echo "folder --" $DIR;
+echo "using --" $PARAM;
 cd $DIR
 
 i=1;
@@ -64,8 +66,8 @@ while read -r line; do
 		    extension=${old#*.}
 		    new=${condition}_${ID}.${extension};
 		    if [ ! -e "$new" ]; then
-			#echo $old "--" $new
-			echo "--"
+			echo "file name from-to : "  $old "--" $new
+			#echo "--"
 			mv "$old" "$new"
 		    else
 			echo "file existed already --", $new 
