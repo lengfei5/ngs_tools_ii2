@@ -64,7 +64,8 @@ if [ -z "$extsize" ]; then
     extsize=0;
 fi
 
-MAPQ_cutoff=10;
+MAPQ_cutoff=0;
+
 OUT="${PWD}/bigWigs"
 mkdir -p $OUT
 mkdir -p ${PWD}/logs
@@ -75,6 +76,7 @@ do
     echo $b
     wig="$(basename $b)"
     wig="${wig%.bam}"
+    wig=${wig}_mq_${MAPQ_cutoff}
     echo $wig
     if [ "$STRAND_specific" != "TRUE" ]; then
 	qsub -q public.q -o ${PWD}/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N bamcoverage " if [ ! -e ${b}.bai ]; then module load samtools; samtools index $b; fi; if [ ! -e ${OUT}/${wig}.bw ]; then module unload deeptools; module load python/2.7.3; module load pysam/0.10.0; module load deeptools/2.2.3-python2.7.3; bamCoverage -b ${b} -o $OUT/${wig}.bw --outFileFormat=bigwig --normalizeUsingRPKM --ignoreDuplicates --minMappingQuality $MAPQ_cutoff --extendReads $extsize; fi;"
