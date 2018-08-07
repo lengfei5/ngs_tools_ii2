@@ -12,20 +12,19 @@ while read -r line; do
     url=`echo "$line" | tr '\t' '\n'|grep "http\|ftp"`
     if [ -n "$url" ]; then
 	file=`basename $url`
-		
+  	ext="${file##*.}"
 	if [ ! -e "$file" ]; then
 	    #echo "here"
 	    echo $url
 	    echo $file
-	    qsub -q public.q -o $DIR_cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N download "wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; touch $file;"
+	    echo $ext
+	    qsub -q public.q -o $DIR_cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N download "wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; touch $file; if [ '$ext' == 'gz' ]; then gunzip $file; fi "
 
 	else
 	    echo "$file -- downloaded !!!"
 	fi
     fi
     
-    #IFS=$'\t' read -r "ID" "url" <<< "$line"
-    #echo $url
-    #wget $url 
     #break;
+    
 done < "$file_urls"
