@@ -13,6 +13,7 @@ while getopts ":hD:se:" opts; do
 	    echo " -D (ABSOLUTE directory for bam input or by defaut alignments/BAMs_All)"
 	    echo " -s (strand-specific, defaut is no)"
 	    echo " -e INT extend read length, the default is 0 bp "
+	    echo " -m the mapping quality cutoff, the default is 10 "
 	    echo "..... "
 	    echo "Example:"
             echo "$0 (if bam files in alignments/BAMs_All for chipseq) "
@@ -28,6 +29,9 @@ while getopts ":hD:se:" opts; do
 	    ;;
 	"e")
 	    extsize="$OPTARG";
+	    ;;
+	"m")
+	    MAPQ_cutoff="$OPTARG"
 	    ;;
         "?")
             echo "Unknown option $opts"
@@ -60,11 +64,8 @@ else
     fi
 fi
 
-if [ -z "$extsize" ]; then
-    extsize=0;
-fi
-
-MAPQ_cutoff=0;
+if [ -z "$extsize" ]; then extsize=0; fi;
+if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=10; fi;
 
 OUT="${PWD}/bigWigs"
 mkdir -p $OUT
