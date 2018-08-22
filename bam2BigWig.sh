@@ -43,7 +43,7 @@ while getopts ":hD:se:" opts; do
     esac
 done
 
-nb_cores=2
+nb_cores=1;
 
 if [ -z "$DIR_bams" ]; then
     DIR_bams="${PWD}/alignments/BAMs_All"
@@ -65,7 +65,7 @@ else
 fi
 
 if [ -z "$extsize" ]; then extsize=0; fi;
-if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=10; fi;
+if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
 OUT="${PWD}/bigWigs"
 mkdir -p $OUT
