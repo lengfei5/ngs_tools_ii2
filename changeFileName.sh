@@ -63,7 +63,12 @@ while read -r line; do
 		echo "More than 2 FILES found for " $ID "--" "${files[@]}";
 	    else
 		for old in "${files[@]}"; do 
-		    extension=${old#*.}
+		    extension=${old##*.}
+		    # add bam. for bai extension
+		    if [ "$extension" == "bai" ]; then
+			extension=bam.${extension}
+		    fi
+		    
 		    new=${condition}_${ID}.${extension};
 		    if [ ! -e "$new" ]; then
 			echo "file name from-to : "  $old "--" $new
