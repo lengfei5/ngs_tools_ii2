@@ -1,23 +1,43 @@
 ############
 # this script is to run fastqc for the ngs data 
 ############
-nb_cores=2
+#nb_cores=1
 cwd=$PWD
-
 DIR_fastq="${PWD}/ngs_raw/FASTQs"
-#echo $DIR_fastq
 DIR_FastQCs=$PWD/ngs_raw/FASTQC;
 
-mkdir -p $PWD/logs
 mkdir -p ${DIR_FastQCs} 
+mkdir -p $PWD/logs
 
-## run fastQC for quality control
+## run fastQC for each fastq file
 for file in ${DIR_fastq}/*.fastq;
 do
     echo $file
-    index_name="$(basename $file)"                                                                                                                                                                                                                        
-    fname=${index_name%.bam}                                                                                                                                                                                                                               
-    #echo $fname                                                                                                                                                                                                                                        
-    qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N fastqc "module load fastqc; fastqc $file -o ${DIR_FastQCs} "
+    file_name="$(basename $file)"                                                                      
+    fname=${file_name%.fastq}                                                                                                   
+    echo $fname
+    
+    # make a script for every sample
+    script=$PWD/logs/${fname}_fastqc.sh
+    cat <<EOF > $script
+#!/usr/bin/bash
+
+#SBATCH --cpus-per-task=1
+#SBATCH --time=60
+#SBATCH --mem=10000
+
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH -o $PWD/logs/$fname.out
+#SBATCH -e $PWD/logs/$fname.err
+#SBATCH --job-name fastqc
+
+module load fastqc/0.11.5-java-1.8.0_121;
+fastqc $file -o ${DIR_FastQCs}
+
+EOF
+
+    cat $script;
+    sbatch $script
 done
 

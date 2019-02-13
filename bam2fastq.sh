@@ -16,7 +16,7 @@ do
     echo $fname
     
     ## creat the script for each sample 
-    script=$PWD/logs/$fname.sh
+    script=$PWD/logs/${fname}_bam2fastq.sh
     cat <<EOF > $script
 #!/usr/bin/bash
 
