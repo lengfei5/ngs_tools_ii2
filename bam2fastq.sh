@@ -32,7 +32,6 @@ do
 #SBATCH --job-name bam2fq
 
 module load bedtools/2.25.0-foss-2017a;
-
 bamToFastq -i $file -fq ${DIR_OUT}/${fname}.fastq;
 
 EOF
