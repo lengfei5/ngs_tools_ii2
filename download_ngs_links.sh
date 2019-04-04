@@ -8,6 +8,8 @@ file_urls="$1";
 nb_cores=1;
 jobName='raw_download'
 DIR_cwd=`pwd`;
+parallel=FALSE
+
 dir_logs=$PWD/logs
 mkdir -p $dir_logs
 
@@ -25,6 +27,8 @@ while read -r line; do
 	    echo $file
 	    #echo $ext
 	    
+	    if [ '$parallel' == 'TRUE' ]; then
+
 	    script=${dir_logs}/${file}_${jobName}.sh
 	    cat <<EOF > $script
 #!/usr/bin/bash
@@ -48,7 +52,13 @@ EOF
 
 	    cat $script;
 	    sbatch $script
-	    
+	    else
+		wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; 
+		touch $file;
+		if [ '$ext' == 'gz' ]; then 
+		    gunzip $file; 
+		fi
+	    fi
 	else
 	    echo "$file -- downloaded !!!"
 	fi
