@@ -71,7 +71,7 @@ while read -r line; do
 		    
 		    new=${condition}_${ID}.${extension};
 		    if [ ! -e "$new" ]; then
-			echo "file name from-to : "  $old "--" $new
+			echo "file name : "  $old "- to -" $new
 			#echo "--"
 			mv "$old" "$new"
 		    else

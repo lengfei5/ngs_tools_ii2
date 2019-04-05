@@ -5,6 +5,7 @@
 # output directory (optional if different from the directory of initial bams),
 # a text file that specifies according what to merge 
 # (same sample ID or replicates, i.e., same condition) and file names after merging. 
+# updated for slurm
 ############
 while getopts ":hD:O:f:tr" opts; do
     case "$opts" in
@@ -68,13 +69,17 @@ if [ "$biologicalRep" == "TRUE" ]; then
     fi
 fi
 
-cwd=$PWD;
-nb_cores=1;
+# internal params
+nb_cores=1
+jobName='mergeRep'
 
+cwd=$PWD;
 DIR_backup=${DIR_OUT}/before_merging
+dir_logs=${cwd}/logs
 mkdir -p $DIR_OUT
 mkdir -p $DIR_backup
-mkdir -p $cwd/logs
+
+mkdir -p $dir_logs
 
 # loop over the design matrix file
 if [ "$merge_techRep" == "TRUE" ]; then
@@ -105,11 +110,38 @@ for selection in "${tomerge[@]}"; do
 	out=${selection}_${id}merged
     fi
     
+    script=${dir_logs}/${selection}_${jobName}.sh
+    cat <<EOF > $script
+#!/usr/bin/bash
+
+#SBATCH --cpus-per-task=$nb_cores
+#SBATCH --time=120
+#SBATCH --mem=6000
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH -o ${script}.out
+#SBATCH -e ${script}.err
+#SBATCH --job-name $jobName
+
+module load samtools/1.9-foss-2017a
+
+EOF
+    
     ## if >= 2 bams found
     if [[ ${#old[@]} -gt 1 ]]; then
 	if [ ! -e "${DIR_OUT}/${out}.bam" ] ; then
 	    echo ${#old[@]} "files found --" $selection  "-- merged file name:" $out
-	    qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N mergeBam "module load samtools/1.3.1; samtools merge ${DIR_OUT}/${out}_unsorted.bam ${old[@]}; samtools sort -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam; samtools index ${DIR_OUT}/${out}.bam; rm $DIR_OUT/${out}_unsorted.bam; mv ${old[@]} $DIR_backup;"
+	    
+	    cat <<EOF >> $script
+samtools merge ${DIR_OUT}/${out}_unsorted.bam ${old[@]}
+samtools sort -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam
+samtools index ${DIR_OUT}/${out}.bam
+rm $DIR_OUT/${out}_unsorted.bam
+#mv ${old[@]} $DIR_backup
+
+EOF
+	    #cat $script;
+	    #sbatch $script
 	fi;
     fi
     ## only 1 bam found
@@ -117,7 +149,15 @@ for selection in "${tomerge[@]}"; do
 	echo ${#old[@]} "file found --" $selection  "-- merged file name:" $out
    	
 	if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
-	    qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N mergeBam "cp ${old[@]} ${DIR_OUT}/${out}.bam; module load samtools/1.3.1; samtools index ${DIR_OUT}/${out}.bam; mv ${old[@]} $DIR_backup;"
+	   cat <<EOF >> $script
+cp ${old[@]} ${DIR_OUT}/${out}.bam
+samtools index ${DIR_OUT}/${out}.bam
+#mv ${old[@]} $DIR_backup;
+
+EOF
+
+	   #cat $script;
+	   #sbatch $script
 	fi;
     fi
     
