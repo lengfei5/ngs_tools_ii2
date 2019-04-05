@@ -116,7 +116,7 @@ for selection in "${tomerge[@]}"; do
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=120
-#SBATCH --mem=6000
+#SBATCH --mem=2000
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH -o ${script}.out
@@ -141,7 +141,7 @@ rm $DIR_OUT/${out}_unsorted.bam
 
 EOF
 	    #cat $script;
-	    #sbatch $script
+	    sbatch $script
 	fi;
     fi
     ## only 1 bam found
@@ -157,7 +157,7 @@ samtools index ${DIR_OUT}/${out}.bam
 EOF
 
 	   #cat $script;
-	   #sbatch $script
+	   sbatch $script
 	fi;
     fi
     
