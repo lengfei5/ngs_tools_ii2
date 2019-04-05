@@ -87,11 +87,8 @@ else
     tomerge=(`cat $params | cut -f2 | sort -u |grep -v fileName|grep -v condition`)
     echo $tomerge
 fi
-#echo $tomerge;
 
 for selection in "${tomerge[@]}"; do
-    #echo $selection
-    #exit
     # find the bam to merge
     old=($(ls ${DIR_Bams}/*.bam | grep "$selection"));
     
@@ -118,7 +115,8 @@ for selection in "${tomerge[@]}"; do
     ## only 1 bam found
     if [[ ${#old[@]} -eq 1 ]] && [ "$merge_bioRep" == "TRUE" ]; then
 	echo ${#old[@]} "file found --" $selection  "-- merged file name:" $out
-   	if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
+   	
+	if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
 	    qsub -q public.q -o $cwd/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N mergeBam "cp ${old[@]} ${DIR_OUT}/${out}.bam; module load samtools/1.3.1; samtools index ${DIR_OUT}/${out}.bam; mv ${old[@]} $DIR_backup;"
 	fi;
     fi
