@@ -43,8 +43,6 @@ while getopts ":hD:se:" opts; do
     esac
 done
 
-nb_cores=1;
-
 if [ -z "$DIR_bams" ]; then
     DIR_bams="${PWD}/alignments/BAMs_All"
     echo "bam directory is $DIR_bams"
@@ -67,22 +65,63 @@ fi
 if [ -z "$extsize" ]; then extsize=0; fi;
 if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
-OUT="${PWD}/bigWigs"
+nb_cores=4;
+OUT="${PWD}/bigWigs_deeptools"
+jobName='bam2bw'
+dir_logs=${PWD}/logs
 mkdir -p $OUT
-mkdir -p ${PWD}/logs
+mkdir -p $dir_logs
 
-for b in ${DIR_bams}/*.bam;
-#for bam in ${DIR_input}/42964_filter_rmdup.bam
+for file in ${DIR_bams}/*.bam;
 do
-    echo $b
-    wig="$(basename $b)"
-    wig="${wig%.bam}"
-    wig=${wig}_mq_${MAPQ_cutoff}
+    echo $file
+    fname="$(basename $file)"
+    fname="${fname%.bam}"
+    wig=${fname}_mq_${MAPQ_cutoff}
     echo $wig
+    script=${dir_logs}/${fname}_${jobName}.sh	
+    
+    cat <<EOF > $script
+#!/usr/bin/bash
+
+#SBATCH --cpus-per-task=$nb_cores
+#SBATCH --time=360
+#SBATCH --mem=6000
+#SBATCH --ntasks=1
+#SBATCH --nodes=1
+#SBATCH -o ${dir_logs}/${fname}.out
+#SBATCH -e ${dir_logs}/${fname}.err
+#SBATCH --job-name $jobName
+
+if [ ! -e ${b}.bai ]; then module load samtools; samtools index $b; fi; 
+if [ ! -e ${OUT}/${wig}.bw ]; then 
+#module unload deeptools; 
+#module load python/2.7.3; 
+#module load pysam/0.10.0; 
+#module load deeptools/2.2.3-python2.7.3;
+module load deeptools/3.1.1-foss-2017a-python-2.7.13
+
+fi
+
+EOF
+ 
     if [ "$STRAND_specific" != "TRUE" ]; then
-	qsub -q public.q -o ${PWD}/logs -j yes -pe smp $nb_cores -cwd -b y -shell y -N bamcoverage " if [ ! -e ${b}.bai ]; then module load samtools; samtools index $b; fi; if [ ! -e ${OUT}/${wig}.bw ]; then module unload deeptools; module load python/2.7.3; module load pysam/0.10.0; module load deeptools/2.2.3-python2.7.3; bamCoverage -b ${b} -o $OUT/${wig}.bw --outFileFormat=bigwig --normalizeUsingRPKM --ignoreDuplicates --minMappingQuality $MAPQ_cutoff --extendReads $extsize; fi;"
+	cat <<EOF >> $script
+bamCoverage -b ${file} \
+-o $OUT/${wig}.bw \
+--outFileFormat=bigwig \
+--normalizeUsing CPM \
+--ignoreDuplicates \
+--minMappingQuality $MAPQ_cutoff \
+--extendReads ${extsize} \
+-p ${nb_cores} \
+--binSize 1 \
+--Offset 1
+EOF
+        
+    cat $script;
+    sbatch $script
     else
 	echo "to complete"
     fi
-
 done
