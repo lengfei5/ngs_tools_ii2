@@ -14,11 +14,12 @@ dir_logs=$PWD/logs
 mkdir -p $dir_logs
 
 while read -r line; do
-    #echo $line;
+    echo $line;
     url=`echo "$line" | tr '\t' '\n'|grep "http\|ftp"`
     #url=${url/gecko/gecko.imp.univie.ac.at}
-    echo url is : $url
+    
     if [ -n "$url" ]; then
+	echo url is : $url
 	file=`basename $url`
   	ext="${file##*.}"
 	if [ ! -e "$file" ]; then
@@ -64,6 +65,6 @@ EOF
 	fi
     fi
     
-    break;
+    #break;
     
 done < "$file_urls"
