@@ -4,7 +4,7 @@
 DIR_INPUT="${PWD}/ngs_raw/BAMs"
 DIR_OUT="${PWD}/ngs_raw/FASTQs"
 dir_logs=$PWD/logs
-echo ${DIR_OUT};
+#echo ${DIR_OUT};
 
 mkdir -p ${DIR_OUT}
 
@@ -12,16 +12,15 @@ mkdir -p ${dir_logs}
 
 for file in $DIR_INPUT/*.bam;
 do 
-    echo "$file"
     FILENAME="$(basename $file)";
     fname=${FILENAME%.bam};
-    echo $fname
+    fname=${fname/\#/\_}
+    echo "$file" $fname
     
     ## creat the script for each sample 
     script=${dir_logs}/${fname}_bam2fastq.sh
     cat <<EOF > $script
 #!/usr/bin/bash
-
 
 #SBATCH --cpus-per-task=1 
 #SBATCH --time=60 
