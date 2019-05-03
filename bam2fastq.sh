@@ -36,7 +36,7 @@ bamToFastq -i $file -fq ${DIR_OUT}/${fname}.fastq;
 
 EOF
     
-    cat $script;
+    #cat $script;
     sbatch $script
     #break;
     
