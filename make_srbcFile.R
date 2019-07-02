@@ -9,7 +9,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 # args = "R5750_Sample_IDs.xlsx"
 # test if there is at least one argument: if not, return an error
-if (length(args) != 2){
+if (length(args) != 3){
   stop("At least one argument must be supplied (input_file).xlsx, .csv or .txt", call.=FALSE)
 }else{
   cat("barcode file : ", args[1], "\nsample_info file : ", args[2], "\n")
@@ -50,9 +50,11 @@ if (length(args) != 2){
   library(openxlsx)
   library(tools)
   
-  #args = c("srbc_all.xlsx", "NGS_Samples_Philipp_20190514_R7846_R7604.xlsx")
+  #args = c("srbc_all.xlsx", "NGS_Samples_Philipp_20190514_R7846_R7604.xlsx", "bam_files.txt")
   bcs = read.xlsx(args[1], sheet = 1, colNames = FALSE,  rowNames = FALSE)
   samples = read.xlsx(args[2], sheet = 1, colNames = TRUE,  rowNames = FALSE)
+  bams = read.table(args[3], header = FALSE, sep = "\t", as.is = c(1))
+  colnames(bams) = "bam_files"
   #samples.names = sapply(colnames(samples), strparsing)
   samples = data.frame(samples$Sample.ID, samples$Adapter.sequence, stringsAsFactors = FALSE)
   colnames(samples) = c("sample", "barcode_name")
@@ -67,6 +69,16 @@ if (length(args) != 2){
   
   newff = data.frame(samples, barcode=bcs$barcode[match(samples$barcode_name, bcs$barcode_name)], stringsAsFactors = FALSE)
   
+  for(n in 1:nrow(newff)){
+    kk = grep(newff$sample[n], bams$bam_files)
+    
+    if(length(kk)==1){
+      cat("sampleID : ", newff$sample[n], "-- bam found :", bams$bam_files[kk], "\n")
+      newff$sample[n] = basename(bams$bam_files[kk])
+    }else{
+      cat("error to find bam file for :", newff$sample[n], "\n" )
+    }
+  }
   colnames(newff) = c("sample", "barcode_name", "barcode")
   write.table(newff, file=paste0("barcodes.txt"),
                sep = "\t", quote = FALSE, col.names = TRUE, row.names = FALSE)
