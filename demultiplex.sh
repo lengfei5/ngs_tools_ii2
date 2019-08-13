@@ -1,8 +1,6 @@
 #####
 ## this script is to demultiplex the bam files from vbcf
 ####
-nb_cores=6
-
 INDEXREAD="FALSE"
 FourC="FALSE"
 
@@ -40,7 +38,7 @@ for RAW in ${DIR_FC}/*.bam; do
             #--correctdual none --dualBClength1 8 --dualBClength2 8"            
             #--indexRead dual2 --dualBClength1 6 --correctdual standard"
     fi;
-    #break;
-    
+    #break;    
 done
+
 cd $DIR_cwd
