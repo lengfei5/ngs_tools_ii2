@@ -77,6 +77,7 @@ do
     echo $file
     fname="$(basename $file)"
     fname="${fname%.bam}"
+    fname=${fname/\#/\_}
     wig=${fname}_mq_${MAPQ_cutoff}
     echo $wig
     script=${dir_logs}/${fname}_${jobName}.sh	
@@ -93,7 +94,7 @@ do
 #SBATCH -e ${dir_logs}/${fname}.err
 #SBATCH --job-name $jobName
 
-if [ ! -e ${b}.bai ]; then module load samtools; samtools index $b; fi; 
+if [ ! -e ${b}.bai ]; then module load samtools/1.4-foss-2017a; samtools index $file; fi; 
 if [ ! -e ${OUT}/${wig}.bw ]; then 
 #module unload deeptools; 
 #module load python/2.7.3; 
@@ -118,10 +119,35 @@ bamCoverage -b ${file} \
 --binSize 1 \
 --Offset 1
 EOF
-        
+    else
+	cat <<EOF >> $script
+bamCoverage -b ${file} \
+--filterRNAstrand forward \
+-o ${OUT}/${wig}_fwd.bw \
+--outFileFormat=bigwig \
+--normalizeUsing CPM \
+--ignoreDuplicates \
+--minMappingQuality $MAPQ_cutoff \
+--extendReads ${extsize} \
+-p ${nb_cores} \
+--binSize 1
+
+bamCoverage -b ${file} \
+--filterRNAstrand reverse \
+-o ${OUT}/${wig}_rev.bw \
+--outFileFormat=bigwig \
+--normalizeUsing CPM \
+--ignoreDuplicates \
+--minMappingQuality $MAPQ_cutoff \
+--extendReads ${extsize} \
+-p ${nb_cores} \
+--binSize 1
+
+EOF
+    fi
+
     cat $script;
     sbatch $script
-    else
-	echo "to complete"
-    fi
+    break
+   
 done
