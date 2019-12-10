@@ -32,7 +32,7 @@ do
 #SBATCH -e ${dir_logs}/${fname}.err 
 #SBATCH --job-name bam2fq
 
-module load bedtools/2.25.0-foss-2017a;
+module load bedtools/2.25.0-foss-2018b;
 bamToFastq -i $file -fq ${DIR_OUT}/${fname}.fastq;
 #gzip ${DIR_OUT}/${fname}.fastq
 
