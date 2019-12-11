@@ -32,7 +32,7 @@ do
 #SBATCH -e $PWD/logs/$fname.err
 #SBATCH --job-name fastqc
 
-module load fastqc/0.11.5-java-1.8.0_121;
+module load fastqc/0.11.8-java-1.8;
 fastqc $file -o ${DIR_FastQCs}
 
 EOF
