@@ -157,11 +157,11 @@ samtools index ${DIR_OUT}/${out}.bam
 EOF
 
 	   #cat $script;
-	   sbatch $script
+	   #sbatch $script
 	fi;
     fi
     
-    #break;
+    break;
 done
 
 
