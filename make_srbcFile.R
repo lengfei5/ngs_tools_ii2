@@ -13,7 +13,7 @@ if (length(args) != 3){
   stop("At least one argument must be supplied (input_file).xlsx, .csv or .txt", call.=FALSE)
 }else{
   cat("barcode file : ", args[1], "\nsample_info file : ", args[2], "\n")
-  cat("outfile name: barcode.txt")
+  cat("outfile name: barcode.txt \n")
   strparsing = function(x)
   {
     #x = sheet[2, 2]
@@ -26,14 +26,11 @@ if (length(args) != 3){
     jj2remove = c()
     for(n in 1:length(strs) )
     {
-      if(n == 1 | n == length(strs))
-      {
+      if(n == 1 | n == length(strs)){
          if(strs[n] == ".") jj2remove = c(jj2remove, n);
-         
       }else{
         if(strs[n-1] == "." & strs[n] == ".") jj2remove = c(jj2remove, n);
       }
-            
     }
 
     if(length(jj2remove)>0)

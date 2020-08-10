@@ -88,15 +88,16 @@ if [ "$merge_techRep" == "TRUE" ]; then
     #echo $tomerge
 else
     echo "-- Merge Biological Replicates --"
-    echo "files to be merged "
+    #echo "files to be merged "
     tomerge=(`cat $params | cut -f2 | sort -u |grep -v fileName|grep -v condition`)
-    echo $tomerge
+    #echo $tomerge
 fi
 
 for selection in "${tomerge[@]}"; do
     # find the bam to merge
+    echo $selection 
     old=($(ls ${DIR_Bams}/*.bam | grep "$selection"));
-    
+    echo $old
     # the name for merged file
     if [ "$merge_techRep" == "TRUE" ]; then
 	cond=`cat $params | grep $selection |cut -f2|sort -u`
@@ -115,7 +116,7 @@ for selection in "${tomerge[@]}"; do
 #!/usr/bin/bash
 
 #SBATCH --cpus-per-task=$nb_cores
-#SBATCH --time=120
+#SBATCH --time=240
 #SBATCH --mem=2000
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -123,7 +124,7 @@ for selection in "${tomerge[@]}"; do
 #SBATCH -e ${script}.err
 #SBATCH --job-name $jobName
 
-module load samtools/1.9-foss-2017a
+module load samtools/1.9-foss-2018b;
 
 EOF
     
@@ -157,11 +158,12 @@ samtools index ${DIR_OUT}/${out}.bam
 EOF
 
 	   #cat $script;
-	   #sbatch $script
+	   sbatch $script
 	fi;
     fi
     
-    break;
+    #break;
+    
 done
 
 
