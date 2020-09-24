@@ -51,11 +51,13 @@ if (length(args) != 3){
   bcs = read.xlsx(args[1], sheet = 1, colNames = FALSE,  rowNames = FALSE)
   samples = read.xlsx(args[2], sheet = 1, colNames = TRUE,  rowNames = FALSE)
   bams = read.table(args[3], header = FALSE, sep = "\t", as.is = c(1))
-
+  
   colnames(bams) = "bam_files"
   #samples.names = sapply(colnames(samples), strparsing)
-  samples = data.frame(samples$Sample.ID, samples$Adapter.sequence, stringsAsFactors = FALSE)
+  #samples = data.frame(samples$Sample.ID, samples$Adapter.sequence, stringsAsFactors = FALSE)
+  samples = data.frame(samples[, c(1:2)], stringsAsFactors = FALSE)
   colnames(samples) = c("sample", "barcode_name")
+  
   samples$barcode_name = sapply(samples$barcode_name, strparsing)
   samples$barcode_name = sapply(samples$barcode_name, function(x) gsub("[.]", "",x))
   
@@ -80,6 +82,7 @@ if (length(args) != 3){
       cat("error to find bam file for :", newff$sample[n], "\n" )
     }
   }
+  
   colnames(newff) = c("sample", "barcode_name", "barcode")
   write.table(newff, file=paste0("barcodes.txt"),
                sep = "\t", quote = FALSE, col.names = TRUE, row.names = FALSE)
