@@ -51,18 +51,22 @@ if (length(args) != 3){
   bcs = read.xlsx(args[1], sheet = 1, colNames = FALSE,  rowNames = FALSE)
   samples = read.xlsx(args[2], sheet = 1, colNames = TRUE,  rowNames = FALSE)
   bams = read.table(args[3], header = FALSE, sep = "\t", as.is = c(1))
+
   colnames(bams) = "bam_files"
   #samples.names = sapply(colnames(samples), strparsing)
   samples = data.frame(samples$Sample.ID, samples$Adapter.sequence, stringsAsFactors = FALSE)
   colnames(samples) = c("sample", "barcode_name")
   samples$barcode_name = sapply(samples$barcode_name, strparsing)
   samples$barcode_name = sapply(samples$barcode_name, function(x) gsub("[.]", "",x))
-  samples$barcode_name = sapply(samples$barcode_name, function(x) gsub("SRB", "sRBC",x))
-  samples = samples[grep("sRBC", samples$barcode_name), ]
+  
+  #samples$barcode_name = sapply(samples$barcode_name, function(x) gsub("SRB", "sRBC",x))
+  samples$barcode_name = sapply(samples$barcode_name, toupper)
+  samples = samples[grep("SRBC", samples$barcode_name), ]
   
   bcs = data.frame(bcs, stringsAsFactors = FALSE)
   colnames(bcs) = c("barcode_name", "barcode")
   bcs$barcode_name = sapply(bcs$barcode_name, function(x) gsub("[-]", "",x))
+  bcs$barcode_name = sapply(bcs$barcode_name, toupper);
   
   newff = data.frame(samples, barcode=bcs$barcode[match(samples$barcode_name, bcs$barcode_name)], stringsAsFactors = FALSE)
   
