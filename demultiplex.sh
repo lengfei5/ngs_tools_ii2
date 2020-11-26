@@ -1,7 +1,6 @@
 #####
 ## this script is to demultiplex the bam files from vbcf
 ####
-INDEXREAD="FALSE"
 jobName='demultiplex'
 
 DIR_cwd=`pwd`
@@ -15,43 +14,47 @@ cd $DIR_FC;
 
 ## demultiplex raw data
 for RAW in ${DIR_FC}/*.bam; do
+
     echo $RAW
     FILENAME="$(basename $RAW)";
     fname=${FILENAME%.*}
     fname=${fname/\#/\_}
     echo "$file" $fname
     
+    PREFIX=$(basename $RAW .bam)
+    DIRNAME="${DIR_OUT}/${PREFIX}_demultiplex"
+
+    echo $DIRNAME
+    
+    mkdir -p $DIRNAME
+        
     script=${fname}_${jobName}.sh
-cat <<EOF > $script
+    
+    cat <<EOF > $script
 #!/usr/bin/bash
 
 #SBATCH --cpus-per-task=6
 #SBATCH --time=4:00:00
-#SBATCH --mem=20000
+#SBATCH --mem=20G
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH -o $dir_logs/${fname}.out
 #SBATCH -e $dir_logs/${fname}.err
 #SBATCH --job-name $jobName
 
-ml load java/1.8.0_121
+ml load java/11.0.2
+export MODULEPATH=/groups/bioinfo/shared/public/modulescbe:$MODULEPATH
+ml load bioinfo.grp/vbcf_demultiplexer/0.8
+
+java -jar $ROOTDEMUX/demultiplexer.jar getbarcodesanddemultiplex --prefix ${DIRNAME}/${PREFIX} --inpath $RAW --tofastq
+
 EOF
     
-    if [ $INDEXREAD != "TRUE" ]; then
-	cat <<EOF >> $script
-/groups/vbcf-ngs/bin/funcGen/jnomicss.sh illumina2BamSplit --inputFile $RAW --toFastq
-EOF
-    else
-	cat <<EOF >> $script
-/groups/vbcf-ngs/bin/funcGen/jnomicss.sh illumina2BamSplit --inputFile $RAW \
---indexRead dual2 --maxMismatches 1 --dualParam 0-0-1  --toFastq
-EOF
-    fi;
-    
-    
-    cat $script;
-    sbatch $script
-    #break;    
+cat $script;
+
+sbatch $script
+#break;    
+
 done
 
 cd $DIR_cwd
