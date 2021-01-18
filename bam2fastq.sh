@@ -23,8 +23,8 @@ do
 #!/usr/bin/bash
 
 #SBATCH --cpus-per-task=1 
-#SBATCH --time=60 
-#SBATCH --mem=10000 
+#SBATCH --time=120 
+#SBATCH --mem=4000 
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
