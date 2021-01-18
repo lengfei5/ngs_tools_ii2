@@ -23,7 +23,7 @@ do
 #!/usr/bin/bash
 
 #SBATCH --cpus-per-task=1
-#SBATCH --time=120
+#SBATCH --time=180
 #SBATCH --mem=20G
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -37,5 +37,6 @@ EOF
 
     cat $script;
     sbatch $script
+    break;
     
 done
