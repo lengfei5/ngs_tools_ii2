@@ -119,6 +119,7 @@ bamCoverage -b ${file} \
 --binSize 1 \
 --Offset 1
 EOF
+
     else
 	cat <<EOF >> $script
 bamCoverage -b ${file} \

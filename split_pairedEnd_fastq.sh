@@ -24,7 +24,7 @@ do
 
 #SBATCH --cpus-per-task=1
 #SBATCH --time=180
-#SBATCH --mem=20G
+#SBATCH --mem=4G
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH -o $DIR/logs/$fname.out
@@ -37,6 +37,6 @@ EOF
 
     cat $script;
     sbatch $script
-    break;
+    #break;
     
 done
