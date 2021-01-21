@@ -46,6 +46,7 @@ done
 if [ -z "$DIR_bams" ]; then
     DIR_bams="${PWD}/alignments/BAMs_All"
     echo "bam directory is $DIR_bams"
+    
 else
     # check if provided directory ends with slash 
     if [[ $DIR_bams == */ ]]; then
@@ -53,6 +54,7 @@ else
 	DIR_bams=${DIR_bams%/}
 	
     fi
+    
     echo "bam directory is $DIR_bams"
     # check if there are bam files in the directory or not
     if [ `ls -l $DIR_bams/*.bam|wc -l` == "1" ]; then
@@ -63,12 +65,15 @@ else
 fi
 
 if [ -z "$extsize" ]; then extsize=0; fi;
+
 if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
-nb_cores=4;
+nb_cores=16;
+
 OUT="${PWD}/bigWigs_deeptools"
 jobName='bam2bw'
 dir_logs=${PWD}/logs
+
 mkdir -p $OUT
 mkdir -p $dir_logs
 
@@ -78,6 +83,8 @@ do
     fname="$(basename $file)"
     fname="${fname%.bam}"
     fname=${fname/\#/\_}
+    
+    bam_sorted=${DIR_bams}/${fname}_sorted.bam
     wig=${fname}_mq_${MAPQ_cutoff}
     echo $wig
     script=${dir_logs}/${fname}_${jobName}.sh	
@@ -87,37 +94,39 @@ do
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=360
-#SBATCH --mem=6000
+#SBATCH --mem=24000
+
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
-#SBATCH -o ${dir_logs}/${fname}.out
-#SBATCH -e ${dir_logs}/${fname}.err
+#SBATCH -o ${dir_logs}/${fname}.${jobName}.out
+#SBATCH -e ${dir_logs}/${fname}.${jobName}.err
 #SBATCH --job-name $jobName
 
-if [ ! -e ${b}.bai ]; then module load samtools/1.4-foss-2017a; samtools index $file; fi; 
-if [ ! -e ${OUT}/${wig}.bw ]; then 
-#module unload deeptools; 
-#module load python/2.7.3; 
-#module load pysam/0.10.0; 
-#module load deeptools/2.2.3-python2.7.3;
-module load deeptools/3.1.1-foss-2017a-python-2.7.13
+if [ ! -e ${file}.bai ]; then
+mkdir -p ${DIR_bams}/bam_backup; 
+module load samtools/1.10-foss-2018b; 
+samtools sort -@ 8 -o $bam_sorted $file
+samtools index -c -m 14 $bam_sorted;
+mv $file ${DIR_bams}/bam_backup;
 
-fi
+fi; 
+
+#ml load deeptools/3.3.1-foss-2018b-python-3.6.6;
 
 EOF
  
     if [ "$STRAND_specific" != "TRUE" ]; then
 	cat <<EOF >> $script
-bamCoverage -b ${file} \
--o $OUT/${wig}.bw \
+singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/local/deeptools_master.sif bamCoverage \
+-b ${bam_sorted} \
+-o ${OUT}/${wig}.bw \
 --outFileFormat=bigwig \
 --normalizeUsing CPM \
 --ignoreDuplicates \
 --minMappingQuality $MAPQ_cutoff \
---extendReads ${extsize} \
 -p ${nb_cores} \
---binSize 1 \
---Offset 1
+--binSize 100 
+ 
 EOF
 
     else
@@ -146,9 +155,10 @@ bamCoverage -b ${file} \
 
 EOF
     fi
-
+    
     cat $script;
     sbatch $script
+    
     break
    
 done
