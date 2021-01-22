@@ -94,7 +94,7 @@ do
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=360
-#SBATCH --mem=24000
+#SBATCH --mem=12G
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1

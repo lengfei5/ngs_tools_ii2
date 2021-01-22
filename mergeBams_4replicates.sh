@@ -70,7 +70,7 @@ if [ "$biologicalRep" == "TRUE" ]; then
 fi
 
 # internal params
-nb_cores=1
+nb_cores=8
 jobName='mergeRep'
 
 cwd=$PWD;
@@ -117,14 +117,14 @@ for selection in "${tomerge[@]}"; do
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=240
-#SBATCH --mem=2000
+#SBATCH --mem=6000
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH -o ${script}.out
 #SBATCH -e ${script}.err
 #SBATCH --job-name $jobName
 
-module load samtools/1.9-foss-2018b;
+module load ml load samtools/1.10-foss-2018b
 
 EOF
     
@@ -134,9 +134,9 @@ EOF
 	    echo ${#old[@]} "files found --" $selection  "-- merged file name:" $out
 	    
 	    cat <<EOF >> $script
-samtools merge ${DIR_OUT}/${out}_unsorted.bam ${old[@]}
-samtools sort -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam
-samtools index ${DIR_OUT}/${out}.bam
+samtools merge -@ $nb_cores ${DIR_OUT}/${out}_unsorted.bam ${old[@]}
+samtools sort -@ $nb_cores -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam
+samtools index -c -m 14 ${DIR_OUT}/${out}.bam
 rm $DIR_OUT/${out}_unsorted.bam
 #mv ${old[@]} $DIR_backup
 
@@ -145,6 +145,7 @@ EOF
 	    sbatch $script
 	fi;
     fi
+    
     ## only 1 bam found
     if [[ ${#old[@]} -eq 1 ]] && [ "$merge_bioRep" == "TRUE" ]; then
 	echo ${#old[@]} "file found --" $selection  "-- merged file name:" $out
