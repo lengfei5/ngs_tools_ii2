@@ -70,7 +70,7 @@ if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
 nb_cores=16;
 
-OUT="${PWD}/bigWigs_deeptools"
+OUT="${PWD}/bigwigs_deeptools"
 jobName='bam2bw'
 dir_logs=${PWD}/logs
 
