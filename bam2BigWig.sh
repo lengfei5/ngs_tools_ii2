@@ -103,6 +103,7 @@ do
 #SBATCH --job-name $jobName
 
 if [ ! -e ${bam_sorted}.csi ]; then
+
 mkdir -p ${DIR_bams}/bam_backup; 
 module load samtools/1.10-foss-2018b; 
 samtools sort -@ 8 -o $bam_sorted $file
