@@ -52,6 +52,7 @@ if [ -z "$DIR_OUT" ]; then
 fi
 merge_techRep="FALSE";
 merge_bioRep="FALSE";
+
 if [ "$technicalRep" == "TRUE" ]; then
     if [ -z "$biologicalRep" ]; then
 	merge_techRep="TRUE";
@@ -76,9 +77,9 @@ jobName='mergeRep'
 cwd=$PWD;
 DIR_backup=${DIR_OUT}/before_merging
 dir_logs=${cwd}/logs
+
 mkdir -p $DIR_OUT
 mkdir -p $DIR_backup
-
 mkdir -p $dir_logs
 
 # loop over the design matrix file
@@ -124,7 +125,7 @@ for selection in "${tomerge[@]}"; do
 #SBATCH -e ${script}.err
 #SBATCH --job-name $jobName
 
-module load ml load samtools/1.10-foss-2018b
+ml load samtools/1.10-foss-2018b
 
 EOF
     
@@ -138,18 +139,18 @@ samtools merge -@ $nb_cores ${DIR_OUT}/${out}_unsorted.bam ${old[@]}
 samtools sort -@ $nb_cores -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam
 samtools index -c -m 14 ${DIR_OUT}/${out}.bam
 rm $DIR_OUT/${out}_unsorted.bam
-#mv ${old[@]} $DIR_backup
+mv ${old[@]} $DIR_backup
 
 EOF
 	    #cat $script;
 	    sbatch $script
+	    
 	fi;
     fi
     
     ## only 1 bam found
     if [[ ${#old[@]} -eq 1 ]] && [ "$merge_bioRep" == "TRUE" ]; then
 	echo ${#old[@]} "file found --" $selection  "-- merged file name:" $out
-   	
 	if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
 	   cat <<EOF >> $script
 cp ${old[@]} ${DIR_OUT}/${out}.bam
