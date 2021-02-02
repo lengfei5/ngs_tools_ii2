@@ -84,7 +84,10 @@ mkdir -p $dir_logs
 
 # loop over the design matrix file
 if [ "$merge_techRep" == "TRUE" ]; then
+    echo '------'
     echo "-- Merge Technical Replicates --"
+    echo '------'
+    
     tomerge=(`cat $params | cut -f1 | sort -u |grep -v sampleID`)
     #echo $tomerge
 else
@@ -98,7 +101,7 @@ for selection in "${tomerge[@]}"; do
     # find the bam to merge
     echo $selection 
     old=($(ls ${DIR_Bams}/*.bam | grep "$selection"));
-    echo $old
+    #echo $old
     # the name for merged file
     if [ "$merge_techRep" == "TRUE" ]; then
 	cond=`cat $params | grep $selection |cut -f2|sort -u`
@@ -109,7 +112,7 @@ for selection in "${tomerge[@]}"; do
 	fi
     else
 	id=`cat $params|grep $selection |cut -f1|sort -u| tr '\n' '.'`
-	out=${selection}_${id}merged
+	out=${selection}_${id}_merged
     fi
     
     script=${dir_logs}/${selection}_${jobName}.sh
@@ -118,7 +121,7 @@ for selection in "${tomerge[@]}"; do
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=240
-#SBATCH --mem=6000
+#SBATCH --mem=32G
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
 #SBATCH -o ${script}.out
@@ -138,10 +141,11 @@ EOF
 samtools merge -@ $nb_cores ${DIR_OUT}/${out}_unsorted.bam ${old[@]}
 samtools sort -@ $nb_cores -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam
 samtools index -c -m 14 ${DIR_OUT}/${out}.bam
-rm $DIR_OUT/${out}_unsorted.bam
+mv $DIR_OUT/${out}_unsorted.bam
 mv ${old[@]} $DIR_backup
 
 EOF
+
 	    #cat $script;
 	    sbatch $script
 	    
@@ -154,13 +158,14 @@ EOF
 	if [ ! -e "${DIR_OUT}/${out}.bam" ]; then
 	   cat <<EOF >> $script
 cp ${old[@]} ${DIR_OUT}/${out}.bam
-samtools index ${DIR_OUT}/${out}.bam
+samtools index -c -m 14 ${DIR_OUT}/${out}.bam
 #mv ${old[@]} $DIR_backup;
 
 EOF
 
 	   #cat $script;
 	   sbatch $script
+	   
 	fi;
     fi
     

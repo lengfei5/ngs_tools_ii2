@@ -13,7 +13,7 @@ while getopts ":hD:se:" opts; do
 	    echo " -D (ABSOLUTE directory for bam input or by defaut alignments/BAMs_All)"
 	    echo " -s (strand-specific, defaut is no)"
 	    echo " -e INT extend read length, the default is 0 bp "
-	    echo " -m the mapping quality cutoff, the default is 10 "
+	    echo " -m the mapping quality cutoff, the default is 30 "
 	    echo "..... "
 	    echo "Example:"
             echo "$0 (if bam files in alignments/BAMs_All for chipseq) "
@@ -83,7 +83,8 @@ do
     fname="$(basename $file)"
     fname="${fname%.bam}"
     fname=${fname/\#/\_}
-    
+
+    bam_save=${DIR_bams}/${fname}.bam
     bam_sorted=${DIR_bams}/${fname}_sorted.bam
     wig=${fname}_mq_${MAPQ_cutoff}
     echo $wig
@@ -94,7 +95,7 @@ do
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=360
-#SBATCH --mem=12G
+#SBATCH --mem=64G
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -105,10 +106,12 @@ do
 if [ ! -e ${bam_sorted}.csi ]; then
 
 mkdir -p ${DIR_bams}/bam_backup; 
-module load samtools/1.10-foss-2018b; 
-samtools sort -@ 8 -o $bam_sorted $file
-samtools index -c -m 14 $bam_sorted;
+module load samtools/1.10-foss-2018b;
+ 
+samtools sort -@ $nb_cores -o $bam_sorted $file
 mv $file ${DIR_bams}/bam_backup;
+mv $bam_sorted $bam_save
+samtools index -c -m 14 $bam_save;
 
 fi; 
 
@@ -119,14 +122,14 @@ EOF
     if [ "$STRAND_specific" != "TRUE" ]; then
 	cat <<EOF >> $script
 singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/local/deeptools_master.sif bamCoverage \
--b ${bam_sorted} \
+-b ${bam_save} \
 -o ${OUT}/${wig}.bw \
 --outFileFormat=bigwig \
 --normalizeUsing CPM \
 --ignoreDuplicates \
 --minMappingQuality $MAPQ_cutoff \
 -p ${nb_cores} \
---binSize 100 
+--binSize 50 
  
 EOF
 
