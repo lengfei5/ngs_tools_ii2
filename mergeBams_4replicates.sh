@@ -141,7 +141,7 @@ EOF
 samtools merge -@ $nb_cores ${DIR_OUT}/${out}_unsorted.bam ${old[@]}
 samtools sort -@ $nb_cores -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam
 samtools index -c -m 14 ${DIR_OUT}/${out}.bam
-mv $DIR_OUT/${out}_unsorted.bam
+mv $DIR_OUT/${out}_unsorted.bam $DIR_backup
 mv ${old[@]} $DIR_backup
 
 EOF

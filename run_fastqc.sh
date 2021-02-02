@@ -3,10 +3,12 @@
 ############
 #nb_cores=1
 cwd=$PWD
-DIR_fastq="${PWD}/ngs_raw/FASTQs"
+DIR_fastq="${PWD}/ngs_raw/FASTQs_toTrim"
 DIR_FastQCs=$PWD/ngs_raw/FASTQC;
+DIR_QCs=$PWD/QCs/cnt_raw
 
-mkdir -p ${DIR_FastQCs} 
+mkdir -p ${DIR_FastQCs}
+mkdir -p ${DIR_QCs}
 mkdir -p $PWD/logs
 
 ## run fastQC for each fastq file
@@ -24,7 +26,7 @@ do
 
 #SBATCH --cpus-per-task=1
 #SBATCH --time=180
-#SBATCH --mem=4G
+#SBATCH --mem=8G
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -33,12 +35,15 @@ do
 #SBATCH --job-name fastqc
 
 module load fastqc/0.11.8-java-1.8;
-fastqc $file -o ${DIR_FastQCs}
+#fastqc $file -o ${DIR_FastQCs}
+
+cat $file | paste - - - - | wc -l > ${DIR_QCs}/${fname}.totalcnt.txt
 
 EOF
 
     cat $script;
     sbatch $script
+    break;
     
 done
 
