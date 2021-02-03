@@ -70,7 +70,7 @@ if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
 nb_cores=16;
 
-OUT="${PWD}/bigwigs_deeptools"
+OUT="${PWD}/bigwigs_deeptools_multimappers"
 jobName='bam2bw'
 dir_logs=${PWD}/logs
 
@@ -127,7 +127,6 @@ singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/loca
 --outFileFormat=bigwig \
 --normalizeUsing CPM \
 --ignoreDuplicates \
---minMappingQuality $MAPQ_cutoff \
 -p ${nb_cores} \
 --binSize 50 
  
