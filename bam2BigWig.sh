@@ -70,7 +70,7 @@ if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
 nb_cores=16;
 
-OUT="${PWD}/bigwigs_deeptools_multimappers"
+OUT="${PWD}/bigwigs_deeptools"
 jobName='bam2bw'
 dir_logs=${PWD}/logs
 
@@ -94,7 +94,7 @@ do
 #!/usr/bin/bash
 
 #SBATCH --cpus-per-task=$nb_cores
-#SBATCH --time=360
+#SBATCH --time=480
 #SBATCH --mem=64G
 
 #SBATCH --ntasks=1
@@ -103,11 +103,11 @@ do
 #SBATCH -e ${dir_logs}/${fname}.${jobName}.err
 #SBATCH --job-name $jobName
 
-if [ ! -e ${bam_sorted}.csi ]; then
-
-mkdir -p ${DIR_bams}/bam_backup; 
 module load samtools/1.10-foss-2018b;
- 
+
+if [ ! -e ${bam_save}.csi ]; then
+
+mkdir -p ${DIR_bams}/bam_backup;  
 samtools sort -@ $nb_cores -o $bam_sorted $file
 mv $file ${DIR_bams}/bam_backup;
 mv $bam_sorted $bam_save
@@ -125,10 +125,10 @@ singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/loca
 -b ${bam_save} \
 -o ${OUT}/${wig}.bw \
 --outFileFormat=bigwig \
---normalizeUsing CPM \
+--normalizeUsing None \
 --ignoreDuplicates \
 -p ${nb_cores} \
---binSize 50 
+--binSize 40 
  
 EOF
 
