@@ -48,7 +48,7 @@ while getopts ":hD:O:f:tr" opts; do
 done
 
 if [ -z "$DIR_OUT" ]; then 
-    DIR_OUT=$DIR_Bams;
+    DIR_OUT=bams_merged;
 fi
 merge_techRep="FALSE";
 merge_bioRep="FALSE";
@@ -147,7 +147,7 @@ mv ${old[@]} $DIR_backup
 EOF
 
 	    #cat $script;
-	    sbatch $script
+	    #sbatch $script
 	    
 	fi;
     fi
