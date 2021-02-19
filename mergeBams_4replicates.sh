@@ -53,6 +53,13 @@ fi
 merge_techRep="FALSE";
 merge_bioRep="FALSE";
 
+if [ -z "$biologicalRep" ] && [ -z "$technicalRep" ]; then
+
+    echo "make a choice -- to merge technical or biological replicates"
+    exit 1;
+    
+fi
+
 if [ "$technicalRep" == "TRUE" ]; then
     if [ -z "$biologicalRep" ]; then
 	merge_techRep="TRUE";
@@ -69,6 +76,7 @@ if [ "$biologicalRep" == "TRUE" ]; then
 	exit 1;
     fi
 fi
+
 
 # internal params
 nb_cores=8
@@ -141,13 +149,13 @@ EOF
 samtools merge -@ $nb_cores ${DIR_OUT}/${out}_unsorted.bam ${old[@]}
 samtools sort -@ $nb_cores -o $DIR_OUT/${out}.bam $DIR_OUT/${out}_unsorted.bam
 samtools index -c -m 14 ${DIR_OUT}/${out}.bam
-mv $DIR_OUT/${out}_unsorted.bam $DIR_backup
+rm $DIR_OUT/${out}_unsorted.bam 
 mv ${old[@]} $DIR_backup
 
 EOF
 
 	    #cat $script;
-	    #sbatch $script
+	    sbatch $script
 	    
 	fi;
     fi
@@ -168,6 +176,7 @@ EOF
 	   
 	fi;
     fi
+    
     
     #break;
     

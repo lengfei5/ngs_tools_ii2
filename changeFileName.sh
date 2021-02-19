@@ -83,6 +83,7 @@ while read -r line; do
 	    echo "NO FILES found -- " $ID;
 	fi
     fi
+    
     i=$((i + 1));
     
 done < "$PARAM"
