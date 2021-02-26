@@ -3,7 +3,7 @@
 # current version is using deeptools to do so
 # options to consider is strand-specific data (e.g. strand-specific RNA-seq)
 #############################
-while getopts ":hD:se:" opts; do
+while getopts ":hD:O:se:" opts; do
     case "$opts" in
         "h")
             echo "script to make BigWig files using bam as inputs"
@@ -11,6 +11,7 @@ while getopts ":hD:se:" opts; do
             echo "Usage:"
 	    echo " -h  (help)"
 	    echo " -D (ABSOLUTE directory for bam input or by defaut alignments/BAMs_All)"
+	    echo " -O output directory "
 	    echo " -s (strand-specific, defaut is no)"
 	    echo " -e INT extend read length, the default is 0 bp "
 	    echo " -m the mapping quality cutoff, the default is 30 "
@@ -23,6 +24,9 @@ while getopts ":hD:se:" opts; do
             ;;
         "D")
             DIR_bams="$OPTARG"
+            ;;
+	"O")
+            OUT="$OPTARG"
             ;;
 	"s")
 	    STRAND_specific="TRUE"
@@ -70,7 +74,10 @@ if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
 nb_cores=16;
 
-OUT="${PWD}/bigwigs_deeptools"
+if [ -z "$OUT" ]; then 
+    OUT="${PWD}/bigwigs_deeptools"
+fi
+
 jobName='bam2bw'
 dir_logs=${PWD}/logs
 
@@ -125,8 +132,7 @@ singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/loca
 -b ${bam_save} \
 -o ${OUT}/${wig}.bw \
 --outFileFormat=bigwig \
---normalizeUsing None \
---ignoreDuplicates \
+--normalizeUsing CPM \
 -p ${nb_cores} \
 --binSize 20 
  
@@ -159,7 +165,7 @@ bamCoverage -b ${file} \
 EOF
     fi
     
-    cat $script;
+    #cat $script;
     sbatch $script
     
     #break
