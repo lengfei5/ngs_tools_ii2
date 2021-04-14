@@ -3,7 +3,7 @@
 ############
 #nb_cores=1
 cwd=$PWD
-DIR_fastq="${PWD}/ngs_raw/FASTQs_toTrim"
+DIR_fastq="${PWD}/ngs_raw/FASTQs"
 DIR_FastQCs=$PWD/ngs_raw/FASTQC;
 DIR_QCs=$PWD/QCs/cnt_raw
 
@@ -41,7 +41,7 @@ cat $file | paste - - - - | wc -l > ${DIR_QCs}/${fname}.cnt.raw.txt
 
 EOF
 
-    cat $script;
+    #cat $script;
     sbatch $script
     #break;
     
