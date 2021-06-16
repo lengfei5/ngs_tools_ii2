@@ -14,12 +14,14 @@ dir_logs=$PWD/logs
 mkdir -p $dir_logs
 
 while read -r line; do
-    echo $line;
-    url=`echo "$line" | tr '\t' '\n'|grep "http\|ftp"`
+    #echo $line;
+    url=`echo $line | tr '\t' '\n'|tr ' ' '\n'| grep "http\|ftp"`
     #url=${url/gecko/gecko.imp.univie.ac.at}
+    #echo $url
     
     if [ -n "$url" ]; then
 	echo url is : $url
+	#break
 	file=`basename $url`
   	ext="${file##*.}"
 	if [ ! -e "$file" ]; then
@@ -56,6 +58,7 @@ EOF
 	    else
 		wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; 
 		touch $file;
+		
 		if [ '$ext' == 'gz' ]; then 
 		    gunzip $file; 
 		fi
