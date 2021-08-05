@@ -35,7 +35,7 @@ do
 #SBATCH --job-name fastqc
 
 module load fastqc/0.11.8-java-1.8;
-#fastqc $file -o ${DIR_FastQCs}
+fastqc $file -o ${DIR_FastQCs}
 
 cat $file | paste - - - - | wc -l > ${DIR_QCs}/${fname}.cnt.raw.txt
 
