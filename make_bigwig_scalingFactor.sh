@@ -79,7 +79,7 @@ if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 nb_cores=16;
 
 if [ -z "$OUT" ]; then 
-    OUT="${PWD}/bigwigs_deeptools"
+    OUT="${PWD}/bigwigs_deeptools.scalingFactor"
 fi
 
 jobName='bam2bw'
@@ -108,7 +108,7 @@ while read -r line; do
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=480
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -138,7 +138,7 @@ singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/loca
 -p ${nb_cores} \
 --binSize 20 \
 --scaleFactor $scaling
- 
+
 EOF
     
     cat $script;
