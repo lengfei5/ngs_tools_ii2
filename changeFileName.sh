@@ -64,10 +64,15 @@ while read -r line; do
 	    else
 		for old in "${files[@]}"; do 
 		    extension=${old##*.}
-		    # add bam. for bai extension
+		    # add bam for bai or csi extension
 		    if [ "$extension" == "bai" ]; then
 			extension=bam.${extension}
 		    fi
+
+		    if [ "$extension" == "csi" ]; then
+			extension=bam.${extension}
+		    fi
+
 		    
 		    new=${condition}_${ID}.${extension};
 		    if [ ! -e "$new" ]; then
