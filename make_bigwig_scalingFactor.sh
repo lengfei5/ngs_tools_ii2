@@ -3,7 +3,7 @@
 # current version is using deeptools to do so
 # options to consider is strand-specific data (e.g. strand-specific RNA-seq)
 #############################
-while getopts ":hD:O:se:f:" opts; do
+while getopts ":hD:O:spe:f:m:" opts; do
     case "$opts" in
         "h")
             echo "script to make BigWig files using bam as inputs"
@@ -13,14 +13,15 @@ while getopts ":hD:O:se:f:" opts; do
 	    echo " -D (ABSOLUTE directory for bam input or by defaut alignments/BAMs_All)"
 	    echo " -O output directory "
 	    echo " -s (strand-specific, defaut is no)"
+	    echo " -p (pair-ended, defaut is single end)"
 	    echo " -e INT extend read length, the default is 0 bp "
 	    echo " -f the file for sample id and scaling factor "
-	    echo " m the mapping quality cutoff, the default is 30 "
+	    echo " -m the mapping quality cutoff, the default is 30 "
 	    echo "..... "
 	    echo "Example:"
             echo "$0 (if bam files in alignments/BAMs_All for chipseq) "
             echo "$0 -D XXX (bam files in XXX directory)"
-            echo "$0 -s (strand-specific bams)"
+            echo "$0 -s (strand-specific bams) -p (pair-ended) -f DESeq2_scalingFactor_forDeeptools.txt"
 	    exit 0
             ;;
         "D")
@@ -32,6 +33,10 @@ while getopts ":hD:O:se:f:" opts; do
 	"s")
 	    STRAND_specific="TRUE"
 	    ;;
+	"p")
+	    pair_end="TRUE"
+	    ;;
+	
 	"e")
 	    extsize="$OPTARG";
 	    ;;
@@ -130,6 +135,11 @@ fi;
 
 #ml load deeptools/3.3.1-foss-2018b-python-3.6.6;
 
+EOF
+
+    if [ "$pair_end" == "TRUE" ]; then
+	cat <<EOF >> $script
+
 singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/local/deeptools_master.sif bamCoverage \
 -b ${bam_save} \
 -o ${OUT}/${wig}.bw \
@@ -138,9 +148,25 @@ singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/loca
 -p ${nb_cores} \
 --binSize 20 \
 --extendReads \
+--minMappingQuality $MAPQ_cutoff \
 --scaleFactor $scaling
 
 EOF
+    else
+	cat <<EOF >> $script
+
+singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/local/deeptools_master.sif bamCoverage \
+-b ${bam_save} \
+-o ${OUT}/${wig}.bw \
+--outFileFormat=bigwig \
+--normalizeUsing CPM \
+-p ${nb_cores} \
+--binSize 20 \
+--minMappingQuality $MAPQ_cutoff \
+--scaleFactor $scaling
+
+EOF
+    fi
     
     cat $script;
     sbatch $script
