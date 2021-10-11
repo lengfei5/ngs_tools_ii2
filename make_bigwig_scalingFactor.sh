@@ -81,7 +81,7 @@ if [ -z "$extsize" ]; then extsize=0; fi;
 
 if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
-nb_cores=16;
+nb_cores=8;
 
 if [ -z "$OUT" ]; then 
     OUT="${PWD}/bigwigs_deeptools.scalingFactor"
@@ -112,8 +112,8 @@ while read -r line; do
 #!/usr/bin/bash
 
 #SBATCH --cpus-per-task=$nb_cores
-#SBATCH --time=480
-#SBATCH --mem=32G
+#SBATCH --time=240
+#SBATCH --mem=16G
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -123,7 +123,7 @@ while read -r line; do
 
 module load samtools/1.10-foss-2018b;
 
-if [ ! -e ${bam_save}.csi ]; then
+#if [ ! -e ${bam_save}.csi ]; then
 
 mkdir -p ${DIR_bams}/bam_backup;  
 samtools sort -@ $nb_cores -o $bam_sorted $file
@@ -131,7 +131,7 @@ mv $file ${DIR_bams}/bam_backup;
 mv $bam_sorted $bam_save
 samtools index -c -m 14 $bam_save;
 
-fi; 
+#fi; 
 
 #ml load deeptools/3.3.1-foss-2018b-python-3.6.6;
 
@@ -169,7 +169,7 @@ EOF
     fi
     
     cat $script;
-    sbatch $script
-    #break
+    #sbatch $script
+    break
    
 done < "$sf"
