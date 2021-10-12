@@ -81,7 +81,7 @@ if [ -z "$extsize" ]; then extsize=0; fi;
 
 if [ -z "$MAPQ_cutoff" ]; then MAPQ_cutoff=30; fi;
 
-nb_cores=8;
+nb_cores=16;
 
 if [ -z "$OUT" ]; then 
     OUT="${PWD}/bigwigs_deeptools.scalingFactor"
@@ -112,8 +112,8 @@ while read -r line; do
 #!/usr/bin/bash
 
 #SBATCH --cpus-per-task=$nb_cores
-#SBATCH --time=240
-#SBATCH --mem=16G
+#SBATCH --time=360
+#SBATCH --mem=24G
 
 #SBATCH --ntasks=1
 #SBATCH --nodes=1
@@ -169,7 +169,7 @@ EOF
     fi
     
     cat $script;
-    #sbatch $script
-    break
+    sbatch $script
+    #break
    
 done < "$sf"
