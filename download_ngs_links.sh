@@ -15,26 +15,30 @@ mkdir -p $dir_logs
 
 while read -r line; do
     #echo $line;
-    url=`echo $line | tr '\t' '\n'|tr ' ' '\n'| grep "http\|ftp"`
+    urls=`echo $line | tr '\t' '\n'|tr ' ' '\n' |grep "http\|ftp"`
     #url=${url/gecko/gecko.imp.univie.ac.at}
     #echo $url
     
-    if [ -n "$url" ]; then
-	echo url is : $url
-	#break
-	file=`basename $url`
-  	ext="${file##*.}"
-	if [ ! -e "$file" ]; then
-	    #echo "here"
-	    #echo $url
-	    echo $file
-	    #echo $ext
-	    
-	    if [ '$parallel' == 'TRUE' ]; then
+    if [ -n "$urls" ]; then
 
-	    script=${dir_logs}/${file}_${jobName}.sh
-	    cat <<EOF > $script
-#!/usr/bin/bash
+	for url in $urls
+	do
+	    echo url is : $url
+	    #break
+	    file=`basename $url`
+  	    ext="${file##*.}"
+	    
+	    if [ ! -e "$file" ]; then
+		#echo "here"
+		#echo $url
+		echo $file
+		#echo $ext
+		
+		if [ '$parallel' == 'TRUE' ]; then
+		    
+		    script=${dir_logs}/${file}_${jobName}.sh
+		    cat <<EOF > $script
+#!/usr/bin/bash	    
 
 #SBATCH --cpus-per-task=$nb_cores
 #SBATCH --time=60
@@ -53,21 +57,24 @@ fi
 
 EOF
 
-	    cat $script;
-	    sbatch $script
-	    else
-		wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; 
-		touch $file;
+		    cat $script;
+		    sbatch $script
+		else
+		    
+		    echo "run  download"
+		    wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; 
+		    touch $file;
 		
-		if [ '$ext' == 'gz' ]; then 
-		    gunzip $file; 
+		    if [ '$ext' == 'gz' ]; then 
+			gunzip $file; 
+		    fi
 		fi
+	    else
+		echo "$file -- downloaded !!!"
 	    fi
-	else
-	    echo "$file -- downloaded !!!"
-	fi
+	done
     fi
-    
-    #break;
-    
+	
+	#break;
+	
 done < "$file_urls"
