@@ -132,7 +132,7 @@ singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/loca
 -b ${bam_save} \
 -o ${OUT}/${wig}.bw \
 --outFileFormat=bigwig \
-#--normalizeUsing CPM \
+--normalizeUsing CPM \
 -p ${nb_cores} \
 --binSize 20 
  
