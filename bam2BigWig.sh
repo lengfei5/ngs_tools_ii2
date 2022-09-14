@@ -112,7 +112,7 @@ do
 
 module load samtools/1.10-foss-2018b;
 
-if [ ! -e ${bam_save}.csi ]; then
+if [ ! -e ${bam_save}.csi ] &&  [ ! -e ${bam_save}.bai ]; then
 
 mkdir -p ${DIR_bams}/bam_backup;  
 samtools sort -@ $nb_cores -o $bam_sorted $file
