@@ -102,14 +102,15 @@ else
     echo "-- Merge Biological Replicates --"
     #echo "files to be merged "
     tomerge=(`cat $params | cut -f2 | sort -u |grep -v fileName|grep -v condition`)
-    #echo $tomerge
+    echo $tomerge
 fi
 
 for selection in "${tomerge[@]}"; do
     # find the bam to merge
     echo $selection 
     old=($(ls ${DIR_Bams}/*.bam | grep "$selection"));
-    #echo $old
+    echo $old
+
     # the name for merged file
     if [ "$merge_techRep" == "TRUE" ]; then
 	cond=`cat $params | grep $selection |cut -f2|sort -u`
@@ -120,7 +121,8 @@ for selection in "${tomerge[@]}"; do
 	fi
     else
 	id=`cat $params|grep $selection |cut -f1|sort -u| tr '\n' '.'`
-	out=${selection}_${id}_merged
+	out=${selection}_${id}merged
+	echo $out
     fi
     
     script=${dir_logs}/${selection}_${jobName}.sh
