@@ -63,6 +63,8 @@ EOF
 		    
 		    echo "run  download"
 		    wget --retry-connrefused -t 0 -c --no-check-certificate --auth-no-challenge $url; 
+		    #wget --user=hannahs --password=Oh8_#rzf $url
+		    
 		    touch $file;
 		
 		    if [ '$ext' == 'gz' ]; then 

@@ -12,8 +12,8 @@ mkdir -p "${DIR}/logs"
 
 jobName='splitPE'
 
-#for file in ${PWD}/*.bam
-for file in `find ${PWD} -name '*.bam' -size +30G`
+for file in ${PWD}/*.bam
+#for file in `find ${PWD} -name '*.bam' -size +30G`
 do
     echo $file
     
