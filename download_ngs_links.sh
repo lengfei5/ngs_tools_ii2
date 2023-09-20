@@ -15,9 +15,9 @@ mkdir -p $dir_logs
 
 while read -r line; do
     #echo $line;
-    urls=`echo $line | tr '\t' '\n'|tr ' ' '\n' |grep "http\|ftp"`
+    urls=`echo $line | tr '\t' '\n'|tr ' ' '\n' |grep "http\|ftp" |tr ';' ' '` 
     #url=${url/gecko/gecko.imp.univie.ac.at}
-    #echo $url
+    echo $url
     
     if [ -n "$urls" ]; then
 

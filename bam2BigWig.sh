@@ -135,7 +135,7 @@ singularity exec --no-home --home /tmp /groups/tanaka/People/current/jiwang/loca
 --normalizeUsing CPM \
 --ignoreDuplicates \
 -p ${nb_cores} \
---binSize 20 
+--binSize 50 
  
 EOF
 

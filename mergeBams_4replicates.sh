@@ -108,6 +108,7 @@ fi
 for selection in "${tomerge[@]}"; do
     # find the bam to merge
     echo $selection 
+
     old=($(ls ${DIR_Bams}/*.bam | grep "$selection"));
     echo $old
 
@@ -156,7 +157,7 @@ mv ${old[@]} $DIR_backup
 
 EOF
 
-	    #cat $script;
+	    cat $script;
 	    sbatch $script
 	    
 	fi;
@@ -178,7 +179,6 @@ EOF
 	   
 	fi;
     fi
-    
     
     #break;
     
